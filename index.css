@@ -1,0 +1,298 @@
+.websiteBody{
+  margin: 0;
+}.Page{
+  display:block;
+  margin:auto;
+  width:100%;
+  height:auto;
+  pointer-events:auto;
+}
+.Page-outer{
+  pointer-events:none;
+  z-index:1;
+}
+.Frame{
+  position:relative;
+  z-index:2;
+  pointer-events:none;
+  width:100%;
+  margin-left:0;
+  height:768px;
+  min-width:200px;
+  max-width:1366px;
+  margin:auto;
+  background-color:rgba(255, 255, 255, 1);
+  overflow:hidden;
+}
+.Frame-outer{
+  pointer-events:none;
+  z-index:2;
+}
+.Rectangle-5{
+  position:relative;
+  z-index:12;
+  pointer-events:none;
+  margin-left:1184px;
+  width:100px;
+  min-width:100px;
+  height:100px;
+  margin-top:4px;
+  margin-bottom:664px;
+  min-height:100px;
+  content:url(assets/images/Rectangle_5.png);
+}
+.Rectangle-5-outer{
+  pointer-events:none;
+  z-index:12;
+  position:relative;
+  display:flex;
+}
+.Ellipse-4{
+  position:relative;
+  z-index:11;
+  pointer-events:none;
+  margin-left:19px;
+  width:100px;
+  min-width:100px;
+  height:100px;
+  margin-top:-757px;
+  margin-bottom:657px;
+  min-height:100px;
+  content:url(assets/images/Ellipse_4.png);
+}
+.Ellipse-4-outer{
+  pointer-events:none;
+  z-index:11;
+  position:relative;
+  display:flex;
+}
+.Home{
+  position:relative;
+  z-index:13;
+  pointer-events:none;
+  margin-left:1130px;
+  width:61px;
+  min-width:61px;
+  margin-top:-729px;
+  margin-bottom:699px;
+  min-height:30px;
+  text-align:left;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  color:rgba(0, 0, 0, 1);
+  font-style:normal;
+  font-family:Poppins;
+  font-weight:600;
+  font-size:20px;
+  line-height:30px;
+}
+.Home-outer{
+  pointer-events:none;
+  z-index:13;
+  position:relative;
+  display:flex;
+}
+.chatAPP{
+  position:relative;
+  z-index:4;
+  pointer-events:none;
+  margin-left:26px;
+  width:86px;
+  min-width:86px;
+  margin-top:-722px;
+  margin-bottom:692px;
+  min-height:30px;
+  text-align:left;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  color:rgba(0, 0, 0, 1);
+  font-style:normal;
+  font-family:Poppins;
+  font-weight:600;
+  font-size:20px;
+  line-height:30px;
+}
+.chatAPP-outer{
+  pointer-events:none;
+  z-index:4;
+  position:relative;
+  display:flex;
+}
+.Rectangle-1{
+  position:relative;
+  z-index:3;
+  pointer-events:none;
+  margin-left:158px;
+  width:1057px;
+  min-width:1057px;
+  height:543px;
+  margin-top:-653px;
+  margin-bottom:110px;
+  min-height:543px;
+  content:url(assets/images/Rectangle_1.png);
+}
+.Rectangle-1-outer{
+  pointer-events:none;
+  z-index:3;
+  position:relative;
+  display:flex;
+}
+.Rectangle-2{
+  position:relative;
+  z-index:7;
+  pointer-events:none;
+  margin-left:690px;
+  width:501px;
+  min-width:501px;
+  height:498px;
+  margin-top:-636px;
+  margin-bottom:138px;
+  min-height:498px;
+  background:linear-gradient(180deg, rgba(43, 192, 30, 1) -3.0616171314629196e-15%, rgba(203, 243, 255, 0) 99.99999999999999%);
+}
+.Rectangle-2-outer{
+  pointer-events:none;
+  z-index:7;
+  position:relative;
+  display:flex;
+}
+.Welcome{
+  position:relative;
+  z-index:14;
+  pointer-events:none;
+  margin-left:393px;
+  width:129px;
+  min-width:129px;
+  margin-top:-561px;
+  margin-bottom:523px;
+  min-height:38px;
+  text-align:left;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  color:rgba(0, 0, 0, 1);
+  font-style:normal;
+  font-family:Poppins;
+  font-weight:500;
+  font-size:25px;
+  line-height:38px;
+}
+.Welcome-outer{
+  pointer-events:none;
+  z-index:14;
+  position:relative;
+  display:flex;
+}
+.a1-1{
+  position:relative;
+  z-index:10;
+  pointer-events:none;
+  margin-left:843px;
+  width:204px;
+  min-width:204px;
+  height:191px;
+  margin-top:-480px;
+  margin-bottom:289px;
+  min-height:191px;
+  content:url(assets/images/a1_1.png);
+}
+.a1-1-outer{
+  pointer-events:none;
+  z-index:10;
+  position:relative;
+  display:flex;
+}
+.Rectangle-3{
+  position:relative;
+  z-index:9;
+  pointer-events:none;
+  margin-left:383px;
+  width:258px;
+  min-width:258px;
+  height:55px;
+  margin-top:-440px;
+  margin-bottom:385px;
+  min-height:55px;
+  content:url(assets/images/Rectangle_3.png);
+}
+.Rectangle-3-outer{
+  pointer-events:none;
+  z-index:9;
+  position:relative;
+  display:flex;
+}
+.SIGN-IN{
+  position:relative;
+  z-index:8;
+  pointer-events:none;
+  margin-left:234px;
+  width:109px;
+  min-width:109px;
+  margin-top:-435px;
+  margin-bottom:390px;
+  min-height:45px;
+  text-align:left;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  color:rgba(0, 0, 0, 1);
+  font-style:normal;
+  font-family:Poppins;
+  font-weight:500;
+  font-size:30px;
+  line-height:46px;
+}
+.SIGN-IN-outer{
+  pointer-events:none;
+  z-index:8;
+  position:relative;
+  display:flex;
+}
+.Rectangle-4{
+  position:relative;
+  z-index:5;
+  pointer-events:none;
+  margin-left:383px;
+  width:258px;
+  min-width:258px;
+  height:55px;
+  margin-top:-371px;
+  margin-bottom:316px;
+  min-height:55px;
+  content:url(assets/images/Rectangle_4.png);
+}
+.Rectangle-4-outer{
+  pointer-events:none;
+  z-index:5;
+  position:relative;
+  display:flex;
+}
+.Password{
+  position:relative;
+  z-index:6;
+  pointer-events:none;
+  margin-left:206px;
+  width:164px;
+  min-width:164px;
+  margin-top:-349px;
+  margin-bottom:291px;
+  min-height:58px;
+  text-align:left;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  color:rgba(0, 0, 0, 1);
+  font-style:normal;
+  font-family:Poppins;
+  font-weight:500;
+  font-size:30px;
+  line-height:46px;
+}
+.Password-outer{
+  pointer-events:none;
+  z-index:6;
+  position:relative;
+  display:flex;
+}
