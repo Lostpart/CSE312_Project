@@ -1,19 +1,19 @@
 from user_CRUD import database_user as userDB
 import re
 
-def login(email, pwd):
+def login(email, password):
     # Return true is the user doesn't exist, return user infomation if the user exist
-    return userDB.getUser(email, pwd)
+    return userDB.getUser(email, password)
 
-def register(username, email, pwd):
+def register(username, email, password):
     # Check if email exist, then check email formmat. If both pass, create the user
     if userDB.getUser(email):
         print("A account with this email already exist")
     elif not checkEmailFormat(email):
         print("The email formmat is wrong.")
     else:
-        userDB.create(username, email, pwd)
-        print("Inserted user: " + username + " " + email + " " + pwd)
+        userDB.create(username, email, password)
+        print("Inserted user: " + username + " " + email + " " + password)
         return True
     return False
 
