@@ -5,14 +5,14 @@ import datetime as dt
 """This object contain the CRUD functions for user"""
 def create(user: str, email:str, password: str):
     """Create user info and store it in DB["user"]"""
-    users_collection = connect_user_DB()
+    users_collection = connectUserDB()
     current_time = getCurrentTime()
     user_dict = {"username": user, "email": email, "password": password, "last_update_time": current_time}
     users_collection.insert_one(user_dict)
 
 def getUser(id = None, email: str = None, password: str = None):
     # 用户登录时我们并不知道id，所以必须用email来查询
-    users_collection = connect_user_DB()
+    users_collection = connectUserDB()
     user_dict = None
     if email != None:
         user_dict = users_collection.find_one({"email": email})
@@ -37,7 +37,7 @@ def updateUser(id: object, email: str = None, username: str = None, password: st
     # updateUser("A", email, "B") will update field A with data B for account "email"
     # Example: updateUser("username", "123@gmail.com", "howie") will update 123@gmail.com's username to howie
     # This function doesn't check email formmat, make check the email formatt before calling this
-    users_collection = connect_user_DB()
+    users_collection = connectUserDB()
     user_dict = users_collection.find_one({"_id": id})
     if user_dict:
         updated_user_dict = dict()
@@ -56,7 +56,7 @@ def updateUser(id: object, email: str = None, username: str = None, password: st
 def deleteUser(id: object):
     return 0
     
-def connect_user_DB():
+def connectUserDB():
     # I'm using localhost. If you're using remote server, please change MongoClient in your need
     # Data formmater: appName -> user
     #                         -> image, etc
