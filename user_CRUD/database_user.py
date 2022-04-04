@@ -1,4 +1,4 @@
-"""This module is to handle CRUD for user"""
+"""This module is used to handle CRUD for user"""
 from pymongo import MongoClient
 import datetime as dt
 
