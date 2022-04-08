@@ -3,7 +3,7 @@ from bson import ObjectId
 
 def insert(user_id: ObjectId, filename: str, image_collection):
     data = {"user_id": user_id, "filename": filename}
-    image_collection.insert_one(data)
+    return image_collection.insert_one(data)
 
 
 def get_by_str_id(image_id: str, image_collection):

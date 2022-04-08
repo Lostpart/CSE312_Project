@@ -2,6 +2,7 @@ import os
 
 from pymongo import MongoClient
 
+
 def connect_databases(collection_list):
     print("Connecting databases")
 
