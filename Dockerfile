@@ -18,7 +18,7 @@ ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait
 # Download dependancies
 RUN chmod +x /wait && pip3 install -r requirements.txt
 
-COPY --from=vueBuild /app/dist /static
+COPY --from=vueBuild /app/dist ./static
 
 EXPOSE 8080
 
