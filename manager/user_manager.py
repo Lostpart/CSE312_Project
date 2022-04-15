@@ -8,14 +8,23 @@ def login(email, password):
 
 def register(username, email, password):
     # Check if email exist, then check email formmat. If both pass, create the user
-    if userDB.getUser(email):
+    status_message = userDB.getUser(None, email)
+    status = status_message["status"]
+    if  status == True:
         print("A account with this email already exist")
+        error_message = "A account with this email already exist."
+        return userDB.constructReturnMessage(False, "error_message", error_message)
     elif not checkEmailFormat(email):
         print("The email formmat is wrong.")
+        error_message = "The email formmat is wrong."
+        return userDB.constructReturnMessage(False, "error_message", error_message)
+    elif password == "":
+        error_message = "password can't be empty"
+        return userDB.constructReturnMessage(False, "error_message", error_message)
     else:
         userDB.create(username, email, password)
         print("Inserted user: " + username + " " + email + " " + password)
-        return True
+        return status_message
     return False
 
 def checkEmailFormat(email: str):

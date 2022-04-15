@@ -10,36 +10,34 @@ def create(displayName: str, email:str, password: str):
     current_time = getCurrentTime()
     user_dict = {"displayName": displayName, "email": email, "password": password, "last_update_time": current_time}
     users_collection.insert_one(user_dict)
+    user_dict.pop("_id")
+
 
 def getUser(id = None, email: str = None, password: str = None):
     # 用户登录时我们并不知道id，所以必须用email来查询
     users_collection = connectUserDB()
     user_dict = None
+    # print(id, email, password)
     if id != None:
         user_dict = users_collection.find_one({"_id": id}, {"last_update_time": 0})
         # print(user_dict)
     elif email != None and password != None:
+        user_dict = users_collection.find_one({"email": email, "password": password}, {"last_update_time": 0})
+        # print(user_dict)
+    elif email != None:
         user_dict = users_collection.find_one({"email": email}, {"last_update_time": 0})
-        # print(user_dict)
     else:
-        error_message = "No password or email"
+        error_message = "information missing"
         return constructReturnMessage(False, "error_message", error_message)
-
     if user_dict:
-        # print("Find user")
-        # print(user_dict)
-        if password == None:
-            error_message = "password can't be None"
-            return constructReturnMessage(False, "error_message", error_message)
-        elif user_dict["password"] == password:
-            user_dict["user_id"] = str(user_dict["_id"])
-            user_dict.pop("_id")
-            user_dict.pop("password")
-            userInfo = user_dict
-            return constructReturnMessage(True, "userInfor", userInfo)
-        else:
-            error_message = "Your email or password is wrong"
-            return constructReturnMessage(False, "error_message", error_message)
+        user_dict["user_id"] = str(user_dict["_id"])
+        user_dict.pop("_id")
+        user_dict.pop("password")
+        userInfo = user_dict
+        return constructReturnMessage(True, "userInfor", userInfo)
+        # else:
+        #     error_message = "Your email or password is wrong"
+        #     return constructReturnMessage(False, "error_message", error_message)
     else:
         error_message = "User not found"
         return constructReturnMessage(False, "error_message", error_message)
@@ -57,7 +55,7 @@ def updateUser(id: object, email: str = None, displayName: str = None, password:
         for key in temp_dict:
             if temp_dict[key] != None:
                 updated_user_dict[key] = temp_dict[key]
-        print(updated_user_dict)
+        # print(updated_user_dict)
         users_collection.update_one({"_id": id}, {"$set": updated_user_dict})
         return True
     else:
@@ -78,8 +76,8 @@ def connectUserDB():
     return users_collection
 
 def constructReturnMessage(status, messageType, message):
-    return_message_dict = {"status": status, "messageType": message}
-    return json.dumps(return_message_dict)
+    return_message_dict = {"status": status, "message": message}
+    return return_message_dict
 
 def getCurrentTime():
     # Get current time as time Object. 
