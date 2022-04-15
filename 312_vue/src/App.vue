@@ -54,10 +54,7 @@
     <v-app-bar app>
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
     </v-app-bar>
-
-    <!-- 根据应用组件来调整你的内容 -->
     <v-main>
-      <!-- 给应用提供合适的间距 -->
       <v-container fluid>
         <router-view></router-view>
       </v-container>
@@ -69,14 +66,13 @@
       height="72"
       inset
     >
-
-
     </v-footer>
   </v-app>
 </template>
 
 <script>
   // import DashBoard from './pages/DashBoard'
+import { io } from "socket.io-client";
 
 export default {
     name: 'App',
@@ -84,20 +80,35 @@ export default {
     // HelloWorld,
     // CardsStack,
     // DashBoard
-},
+    },
     data: () => ({ 
       drawer: null,
       links: [
             ['mdi-message-text', 'Messages', '/messages'],
             ['mdi-account-multiple', 'Square', '/about'],
       ]}),
-
     methods: {
       reserve () {
         this.loading = true
         setTimeout(() => (this.loading = false), 2000)
       },
     },
+    mounted(){
+      const socket = io('http://localhost:8080',{
+        transports: ['websocket','polling'],
+        // transports: ["polling"],
+        upgrade: true,
+        rejectUnauthorized: false
+      })
+      socket.on("connect_error", (err) => {
+        console.log(err);
+      });
+      socket.on("connect", (resp) => {
+        console.log(socket.id);
+        console.log(resp); 
+      });
+      console.log(io)
+    }
   }
 </script>
 
