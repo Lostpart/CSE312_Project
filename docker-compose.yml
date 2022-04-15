@@ -1,0 +1,31 @@
+version: '3.3'
+services:
+  mongo:
+    container_name: mongo
+    image: mongo:5
+    volumes:
+      - ./mongodb-data/:/data/db/
+    ports:
+      - "27017:27017"
+  mongo-express:
+    container_name: mongo-express
+    image: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: MEAdmin
+      ME_CONFIG_BASICAUTH_PASSWORD: MEPassword!
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_SERVER: mongo
+    depends_on:
+      - app
+  app:
+    build: .
+    environment:
+      WAIT_HOSTS: mongo:27017
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./static/upload-image/:/root/static/upload-image/
+    depends_on:
+      - mongo
