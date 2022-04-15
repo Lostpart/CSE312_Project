@@ -10,7 +10,11 @@ def create(displayName: str, email:str, password: str):
     current_time = getCurrentTime()
     user_dict = {"displayName": displayName, "email": email, "password": password, "last_update_time": current_time}
     users_collection.insert_one(user_dict)
+    user_dict["user_id"] = str(user_dict["_id"])
     user_dict.pop("_id")
+    user_dict.pop("password")
+    user_dict.pop("last_update_time")
+    return user_dict
 
 
 def getUser(id = None, email: str = None, password: str = None):
@@ -28,19 +32,19 @@ def getUser(id = None, email: str = None, password: str = None):
         user_dict = users_collection.find_one({"email": email}, {"last_update_time": 0})
     else:
         error_message = "information missing"
-        return constructReturnMessage(False, "error_message", error_message)
+        return constructReturnMessage(False, error_message)
     if user_dict:
         user_dict["user_id"] = str(user_dict["_id"])
         user_dict.pop("_id")
         user_dict.pop("password")
         userInfo = user_dict
-        return constructReturnMessage(True, "userInfor", userInfo)
+        return constructReturnMessage(True, userInfo)
         # else:
         #     error_message = "Your email or password is wrong"
         #     return constructReturnMessage(False, "error_message", error_message)
     else:
         error_message = "User not found"
-        return constructReturnMessage(False, "error_message", error_message)
+        return constructReturnMessage(False, error_message)
 
 def updateUser(id: object, email: str = None, displayName: str = None, password: str = None):
     # updateUser("A", email, "B") will update field A with data B for account "email"
@@ -75,7 +79,7 @@ def connectUserDB():
     users_collection = db["user"]
     return users_collection
 
-def constructReturnMessage(status, messageType, message):
+def constructReturnMessage(status, message):
     return_message_dict = {"status": status, "message": message}
     return return_message_dict
 

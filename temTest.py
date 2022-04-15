@@ -27,9 +27,9 @@ if __name__ == "__main__":
     user.append((username3, email3, password3))
     user.append((username4, email4, password4))
     user.append((username5, email5, password5))
-    # for i in range(5):
-    #     print(um.register(user[i][0], user[i][1], user[i][2]))
-
     for i in range(5):
-        # print(user[i][1])
-        print(um.login(user[i][1], user[i][2]))
+        print(um.register(user[i][0], user[i][1], user[i][2]))
+
+    # for i in range(5):
+    #     # print(user[i][1])
+    #     print(um.login(user[i][1], user[i][2]))
