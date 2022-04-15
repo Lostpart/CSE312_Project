@@ -1,8 +1,13 @@
+import base64
 import hashlib
 import random
 from bson import ObjectId
 
 from dal import image_dal
+
+
+def add_image_by_base64(user_id: str, image_data: bytes, image_type: str, image_collection):
+    return add_image(user_id, base64.b64decode(image_data), image_type, image_collection)
 
 
 def add_image(user_id: str, image_data: bytes, image_type: str, image_collection):
