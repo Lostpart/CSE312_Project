@@ -28,4 +28,4 @@ def add_image(user_id: ObjectId, image_data: bytes, image_type: str, image_colle
 
 
 def get_image_name(image_id: ObjectId, image_collection):
-    return image_dal.get_by_object_id(image_id, image_collection)
+    return image_dal.get_image_by_image_id(image_id, image_collection)["filename"]
