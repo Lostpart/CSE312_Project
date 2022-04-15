@@ -47,6 +47,7 @@ def getUser(id = None, email: str = None, password: str = None):
         return constructReturnMessage(False, error_message)
 
 def updateUser(id: object, email: str = None, displayName: str = None, password: str = None):
+    # Not modified yet
     # updateUser("A", email, "B") will update field A with data B for account "email"
     # Example: updateUser("displayName", "123@gmail.com", "howie") will update 123@gmail.com's displayName to howie
     # This function doesn't check email formmat, make check the email formatt before calling this
