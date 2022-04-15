@@ -94,7 +94,7 @@
             </v-icon> 
           </v-btn>
         </v-sheet>
-      </v-col>  
+      </v-col>
     </v-row>
   </div>
 </template>

@@ -66,6 +66,30 @@
       height="72"
       inset
     >
+    <div class="text-center ma-2">
+      <v-btn
+        dark
+        @click="snackbar = true"
+      >
+        Check Socket Status
+      </v-btn>
+      <v-snackbar
+        v-model="snackbar"
+      >
+        {{ text }}
+
+        <template v-slot:action="{ attrs }">
+          <v-btn
+            color="pink"
+            text
+            v-bind="attrs"
+            @click="snackbar = false"
+          >
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
+    </div>
     </v-footer>
   </v-app>
 </template>
@@ -82,6 +106,8 @@ export default {
     // DashBoard
     },
     data: () => ({ 
+      snackbar: false,
+      text:'',
       drawer: null,
       links: [
             ['mdi-message-text', 'Messages', '/messages'],
@@ -96,18 +122,19 @@ export default {
     mounted(){
       const socket = io('http://localhost:8080',{
         transports: ['websocket','polling'],
-        // transports: ["polling"],
-        upgrade: true,
-        rejectUnauthorized: false
       })
       socket.on("connect_error", (err) => {
-        console.log(err);
+        this.text = err
+        this.snackbar = true
       });
       socket.on("connect", (resp) => {
-        console.log(socket.id);
-        console.log(resp); 
+        this.text = socket.id + ' ' +resp.data
+        this.snackbar = true
       });
-      console.log(io)
+      socket.on("disconnect", () => {
+        this.text = 'Disconnected'
+        this.snackbar = true
+      });
     }
   }
 </script>
