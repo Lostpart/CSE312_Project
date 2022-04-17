@@ -1,8 +1,9 @@
 import json
 import sys
 
-from flask import Flask
-from flask_socketio import SocketIO
+from flask import Flask, request
+from flask_socketio import SocketIO, join_room
+from feature.chat import chat_db
 
 app = Flask(__name__, static_url_path='')
 # Python Socket code from 2019 Spring CSE 116
@@ -12,6 +13,20 @@ socket_server = SocketIO(app, cors_allowed_origins='*')
 @app.route("/")
 def index():
     return app.send_static_file("index.html")
+
+@app.route("/sendchat")
+def send_chat():
+    data=json.loads(request.get_data(as_text=True))
+    print(data)
+    receive = chat_db.send_chat(data)
+    return "success"
+
+@app.route("/getchat")
+def chat_history():
+    data=json.loads(request.get_data(as_text=True))
+    print(data)
+    receive = chat_db.chat_history(data)
+    return receive
 
 
 @socket_server.on('connect')
@@ -33,6 +48,20 @@ def test_msg(rawdata):
     socket_server.emit('test_msg', response)
     pass
 
+@socket_server.on('send_chat') # room
+def send_chat(rawdata):
+    # rawdata = str(request.data)
+    to=rawdata["to"]
+    join_room(to)
+    print("Client→Python：{}".format(rawdata))
+    response = json.dumps({"msg_type": "send_chat", "msg": rawdata})
+    socket_server.emit('send_chat', response, room=to)
+    pass
+
+@socket_server.on('test_memory')
+def send_memory(rawdata):
+    # call memory function
+    socket_server.emit('test_memory', rawdata, broadcast=True)
 
 if __name__ == '__main__':
     port = 8080

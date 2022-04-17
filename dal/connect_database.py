@@ -16,6 +16,7 @@ def connect_databases(collection_list):
 
     # initialize_database(db_list)
     print("initialize_database success")
+    print(db_list)
     return db_list
 
 
