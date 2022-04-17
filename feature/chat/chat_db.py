@@ -1,17 +1,17 @@
 from bson import ObjectId
 from dal import connect_database
-
+from manager import image_manager
 
 def send_chat(data): #add chat
     chat_collection = connect_database.connect_databases(["chat"])
     from_user = data["from"]
     to_user = data["to"]
     message = data["message"]
-    image = data["image"]
-    if(image!=None):
-        # call image function
-        pass
-    chat_collection.insert_one({"from": ObjectId(from_user), "to": ObjectId(to_user), "message": message, "image": image})
+    image_data = data["image"]
+    image_id = None
+    if(image_data != None):
+        image_id = image_manager.add_image_by_base64(image_data)
+    chat_collection.insert_one({"from": ObjectId(from_user), "to": ObjectId(to_user), "message": message, "image": image_id})
     return
 
 def chat_history(data): #chat history
