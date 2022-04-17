@@ -44,7 +44,7 @@ def chat_history(data): #chat history
     # get all chat sort by timestamp in _id
     final_answer = chat_collection.find({}).sort([['_id', 1]])
     for i in final_answer:
-        i["_id"] = str(i["_id"])
+        del i["_id"]
         i["from"] = str(i["from"])
         i["to"] = str(i["to"])
         list1.append(i)
