@@ -30,6 +30,7 @@ def chat_history():
     receive = chat_db.chat_history(data)
     return receive
 
+# -------------- socket_server ------------------
 
 @socket_server.on('connect')
 def test_connect():

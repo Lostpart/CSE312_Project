@@ -5,9 +5,10 @@ from flask_socketio import join_room
 from feature.chat import check_chat_format, chat_db
 
 
-def controller(data):
+def controller(rawdata):
     # rawdata {"from": str, "to": str, "message": str, "image": null}
-    check, note = check_chat_format.check_data(json.loads(data))  # check chat format
+    data = json.loads(rawdata)
+    check, note = check_chat_format.check_data(data)  # check chat format
     if check:  # error message
         error_msg = {"status": "error", "error_message": note}
         return False, error_msg
