@@ -1,4 +1,3 @@
-from user_CRUD import database_user as db_user
 from manager import user_manager as um
 if __name__ == "__main__":
     username1 = "howie"

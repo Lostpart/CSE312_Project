@@ -1,5 +1,5 @@
 import re
-from user_CRUD import database_user as userDB
+from dal import user_dal as userDB
 import json
 
 
