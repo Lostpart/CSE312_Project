@@ -54,10 +54,7 @@
     <v-app-bar app>
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
     </v-app-bar>
-
-    <!-- 根据应用组件来调整你的内容 -->
     <v-main>
-      <!-- 给应用提供合适的间距 -->
       <v-container fluid>
         <router-view></router-view>
       </v-container>
@@ -69,14 +66,37 @@
       height="72"
       inset
     >
+    <div class="text-center ma-2">
+      <v-btn
+        dark
+        @click="snackbar = true"
+      >
+        Check Socket Status
+      </v-btn>
+      <v-snackbar
+        v-model="snackbar"
+      >
+        {{ text }}
 
-
+        <template v-slot:action="{ attrs }">
+          <v-btn
+            color="pink"
+            text
+            v-bind="attrs"
+            @click="snackbar = false"
+          >
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
+    </div>
     </v-footer>
   </v-app>
 </template>
 
 <script>
   // import DashBoard from './pages/DashBoard'
+import { io } from "socket.io-client";
 
 export default {
     name: 'App',
@@ -84,20 +104,38 @@ export default {
     // HelloWorld,
     // CardsStack,
     // DashBoard
-},
+    },
     data: () => ({ 
+      snackbar: false,
+      text:'',
       drawer: null,
       links: [
             ['mdi-message-text', 'Messages', '/messages'],
             ['mdi-account-multiple', 'Square', '/about'],
       ]}),
-
     methods: {
       reserve () {
         this.loading = true
         setTimeout(() => (this.loading = false), 2000)
       },
     },
+    mounted(){
+      const socket = io('http://localhost:8080',{
+        transports: ['websocket','polling'],
+      })
+      socket.on("connect_error", (err) => {
+        this.text = err
+        this.snackbar = true
+      });
+      socket.on("connect", (resp) => {
+        this.text = socket.id + ' ' +resp.data
+        this.snackbar = true
+      });
+      socket.on("disconnect", () => {
+        this.text = 'Disconnected'
+        this.snackbar = true
+      });
+    }
   }
 </script>
 

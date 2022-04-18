@@ -6,7 +6,7 @@ from flask_socketio import SocketIO
 
 app = Flask(__name__, static_url_path='')
 # Python Socket code from 2019 Spring CSE 116
-socket_server = SocketIO(app)
+socket_server = SocketIO(app, cors_allowed_origins='*')
 
 
 @app.route("/")
