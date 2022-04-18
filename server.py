@@ -3,7 +3,7 @@ import sys
 
 from flask import Flask, request
 from flask_socketio import SocketIO, join_room
-from feature.chat import chat_db
+from feature.chat import chat_db, check_chat_format, chat_controller
 
 app = Flask(__name__, static_url_path='')
 # Python Socket code from 2019 Spring CSE 116
@@ -14,16 +14,18 @@ socket_server = SocketIO(app, cors_allowed_origins='*')
 def index():
     return app.send_static_file("index.html")
 
-@app.route("/sendchat")
+
+@app.route("/test-sendchat")
 def send_chat():
-    data=json.loads(request.get_data(as_text=True))
+    data = json.loads(request.get_data(as_text=True))
     print(data)
     receive = chat_db.send_chat(data)
     return "success"
 
-@app.route("/getchat")
+
+@app.route("/test-getchat")
 def chat_history():
-    data=json.loads(request.get_data(as_text=True))
+    data = json.loads(request.get_data(as_text=True))
     print(data)
     receive = chat_db.chat_history(data)
     return receive
@@ -48,20 +50,22 @@ def test_msg(rawdata):
     socket_server.emit('test_msg', response)
     pass
 
-@socket_server.on('send_chat') # room
+
+@socket_server.on('send_chat')  # room
 def send_chat(rawdata):
-    # rawdata = str(request.data)
-    to=rawdata["to"]
-    join_room(to)
-    print("Client→Python：{}".format(rawdata))
-    response = json.dumps({"msg_type": "send_chat", "msg": rawdata})
-    socket_server.emit('send_chat', response, room=to)
+    check, answer = chat_controller.controller(rawdata)
+    if check:
+        socket_server.emit('error', json.dumps(answer))
+    else:
+        socket_server.emit('new_chat', json.dumps(answer["response"]), room=json.dumps(answer["to"]))
     pass
+
 
 @socket_server.on('test_memory')
 def send_memory(rawdata):
     # call memory function
     socket_server.emit('test_memory', rawdata, broadcast=True)
+
 
 if __name__ == '__main__':
     port = 8080
