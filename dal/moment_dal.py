@@ -8,8 +8,8 @@ def insert(user_id: ObjectId, content: str, image_list, moment_collection):
     return moment_collection.insert_one(data)
 
 
-def get_recent_moments(moment_collection, n=1000):
-    return moment_collection.find().sort({"_id": -1}).limit(n)
+def get_recent_moments(moment_collection, limit=1000):
+    return moment_collection.find().sort({"_id": -1}).limit(limit)
 
 
 def like_moment(moment_id: ObjectId, moment_collection):
