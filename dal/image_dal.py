@@ -13,5 +13,6 @@ def get_by_str_id(image_id: str, image_collection):
 def get_image_by_image_id(image_id: ObjectId, image_collection):
     return image_collection.find_one({"_id": image_id})
 
+
 def get_image_filename_by_image_id(image_id: ObjectId, image_collection):
     return image_collection.find_one({"_id": image_id})["filename"]
