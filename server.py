@@ -3,6 +3,8 @@ import sys
 
 from flask import Flask, request
 from flask_socketio import SocketIO, join_room
+
+from dal import connect_database
 from feature.chat import chat_db, check_chat_format, chat_controller
 
 app = Flask(__name__, static_url_path='')
@@ -15,20 +17,23 @@ def index():
     return app.send_static_file("index.html")
 
 
-@app.route("/test-sendchat")
-def send_chat():
+@app.route("/sendchat", methods=["POST"])
+def test_send_chat():
     data = json.loads(request.get_data(as_text=True))
-    print(data)
-    receive = chat_db.send_chat(data)
+    mock_chat_collection = connect_database.connect_databases(["chat"])  # connect db
+    mock_chat_collection = mock_chat_collection["chat"]
+    receive = chat_db.send_chat(data, mock_chat_collection)
     return "success"
 
 
-@app.route("/test-getchat")
+@app.route("/chathistory")
 def chat_history():
     data = json.loads(request.get_data(as_text=True))
-    print(data)
-    receive = chat_db.chat_history(data)
+    chat_collection = connect_database.connect_databases(["chat"])  # connect db
+    chat_collection = chat_collection["chat"]
+    receive = chat_db.chat_history(data, chat_collection)
     return receive
+
 
 # -------------- socket_server ------------------
 
@@ -66,6 +71,27 @@ def send_chat(rawdata):
 def send_memory(rawdata):
     # call memory function
     socket_server.emit('test_moment', rawdata, broadcast=True)
+
+
+# ------------------ test_route -------------------
+@app.route("/test-sendchat", methods=["POST"])
+def test_send_chat():
+    data = json.loads(request.get_data(as_text=True))
+    print(data)
+    mock_chat_collection = connect_database.connect_databases(["test-chat"])  # connect db
+    mock_chat_collection = mock_chat_collection["test-chat"]
+    receive = chat_db.send_chat(data, mock_chat_collection)
+    return "success"
+
+
+@app.route("/test-getchat")
+def test_chat_history():
+    data = json.loads(request.get_data(as_text=True))
+    mock_chat_collection = connect_database.connect_databases(["test-chat"])  # connect db
+    mock_chat_collection = mock_chat_collection["test-chat"]
+    receive = chat_db.chat_history(data, mock_chat_collection)
+    mock_chat_collection.delete_many({})
+    return receive
 
 
 if __name__ == '__main__':

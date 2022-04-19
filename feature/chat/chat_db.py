@@ -5,9 +5,8 @@ from dal import connect_database
 from manager import image_manager
 
 
-def send_chat(data):  # add chat
-    chat_collection = connect_database.connect_databases(["chat"])
-    chat_collection = chat_collection["chat"]
+def send_chat(data, chat_collection):  # add chat
+    print(chat_collection)
     from_user = data["from"]
     to_user = data["to"]
     message = data["message"]
@@ -20,14 +19,12 @@ def send_chat(data):  # add chat
     return
 
 
-def chat_history(data):  # chat history
+def chat_history(data, chat_collection):  # chat history
     # return list
     list1 = []
     user_from = data["from"]
     user = data["to"]
     # get collection
-    chat_collection = connect_database.connect_databases(["chat"])
-    chat_collection = chat_collection["chat"]
     chat_tmp_collection = connect_database.connect_databases(["chat_tmp"])
     chat_tmp_collection = chat_tmp_collection["chat_tmp"]
 
@@ -35,17 +32,17 @@ def chat_history(data):  # chat history
     chat_tmp_collection.delete_many({})
 
     # get chat 1
-    answer1 = chat_collection.find({"$and": [{"from": {"$eq": ObjectId(user_from)}}, {"to": {"$eq": ObjectId(user)}}]})
+    answer1 = chat_collection.find({"from": ObjectId(user_from), "to": ObjectId(user)})
     for data in answer1:
         chat_tmp_collection.insert_one(data)
 
     # get chat 2 (reverse from and to)
-    answer2 = chat_collection.find({"$and": [{"from": {"$eq": ObjectId(user)}}, {"to": {"$eq": ObjectId(user_from)}}]})
+    answer2 = chat_collection.find({"from": ObjectId(user), "to": ObjectId(user_from)})
     for data in answer2:
         chat_tmp_collection.insert_one(data)
 
     # get all chat sort by timestamp in _id
-    final_answer = chat_collection.find({}).sort([['_id', 1]])
+    final_answer = chat_tmp_collection.find({}).sort([['_id', 1]])
     for i in final_answer:
         del i["_id"]
         i["from"] = str(i["from"])
