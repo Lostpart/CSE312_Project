@@ -5,14 +5,14 @@ from dal import connect_database
 from manager import image_manager
 
 
-def send_chat(data, chat_collection):  # add chat
+def send_chat(data, chat_collection, image_check):  # add chat
     print(chat_collection)
     from_user = data["from"]
     to_user = data["to"]
     message = data["message"]
-    image_data = data["image"]
     image_id = None
-    if image_data is not None:
+    if image_check:
+        image_data = data["image"]
         image_id = image_manager.add_image_by_base64(image_data)
     chat_collection.insert_one(
         {"from": ObjectId(from_user), "to": ObjectId(to_user), "message": message, "image": image_id})
@@ -22,8 +22,10 @@ def send_chat(data, chat_collection):  # add chat
 def chat_history(data, chat_collection):  # chat history
     # return list
     list1 = []
+
     user_from = data["from"]
     user = data["to"]
+
     # get collection
     chat_tmp_collection = connect_database.connect_databases(["chat_tmp"])
     chat_tmp_collection = chat_tmp_collection["chat_tmp"]
@@ -51,4 +53,5 @@ def chat_history(data, chat_collection):  # chat history
 
     # clean collection
     chat_tmp_collection.delete_many({})
+    # close chat_tmp_collection connection
     return json.dumps(list1)

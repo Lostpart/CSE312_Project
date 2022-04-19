@@ -2,10 +2,10 @@ import json
 import sys
 
 from flask import Flask, request
-from flask_socketio import SocketIO, join_room
+from flask_socketio import SocketIO
 
-from dal import connect_database
-from feature.chat import chat_db, check_chat_format, chat_controller
+from dal import connect_database, chat_db
+from chat import chat_controller
 
 app = Flask(__name__, static_url_path='')
 # Python Socket code from 2019 Spring CSE 116
@@ -68,8 +68,8 @@ def send_chat(rawdata):
 
 
 @socket_server.on('test_moment')
-def send_memory(rawdata):
-    # call memory function
+def send_moment(rawdata):
+    # call moment function
     socket_server.emit('test_moment', rawdata, broadcast=True)
 
 
