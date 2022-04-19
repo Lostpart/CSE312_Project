@@ -4,7 +4,8 @@ from bson import ObjectId
 from dal import connect_database
 from manager import image_manager
 
-def send_chat(data): #add chat
+
+def send_chat(data):  # add chat
     chat_collection = connect_database.connect_databases(["chat"])
     chat_collection = chat_collection["chat"]
     from_user = data["from"]
@@ -12,12 +13,14 @@ def send_chat(data): #add chat
     message = data["message"]
     image_data = data["image"]
     image_id = None
-    if(image_data != None):
+    if image_data is not None:
         image_id = image_manager.add_image_by_base64(image_data)
-    chat_collection.insert_one({"from": ObjectId(from_user), "to": ObjectId(to_user), "message": message, "image": image_id})
+    chat_collection.insert_one(
+        {"from": ObjectId(from_user), "to": ObjectId(to_user), "message": message, "image": image_id})
     return
 
-def chat_history(data): #chat history
+
+def chat_history(data):  # chat history
     # return list
     list1 = []
     user_from = data["from"]
@@ -48,7 +51,6 @@ def chat_history(data): #chat history
         i["from"] = str(i["from"])
         i["to"] = str(i["to"])
         list1.append(i)
-
 
     # clean collection
     chat_tmp_collection.delete_many({})

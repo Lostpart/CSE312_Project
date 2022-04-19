@@ -52,7 +52,7 @@ def test_msg(rawdata):
     pass
 
 
-@socket_server.on('send_chat')  # room
+@socket_server.on('send_chat')
 def send_chat(rawdata):
     check, answer = chat_controller.controller(rawdata)
     if check:
@@ -62,10 +62,10 @@ def send_chat(rawdata):
     pass
 
 
-@socket_server.on('test_memory')
+@socket_server.on('test_moment')
 def send_memory(rawdata):
     # call memory function
-    socket_server.emit('test_memory', rawdata, broadcast=True)
+    socket_server.emit('test_moment', rawdata, broadcast=True)
 
 
 if __name__ == '__main__':
