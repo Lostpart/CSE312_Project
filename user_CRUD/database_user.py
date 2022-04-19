@@ -6,6 +6,7 @@ import json
 """This object contain the CRUD functions for user"""
 def create(displayName: str, email:str, password: str):
     """Create user info and store it in DB["user"]"""
+    # Return {"displayername": displayname, "email": email, "user_id": id}
     users_collection = connectUserDB()
     current_time = getCurrentTime()
     user_dict = {"displayName": displayName, "email": email, "password": password, "last_update_time": current_time}
@@ -76,7 +77,7 @@ def connectUserDB():
     # Data formmater: appName -> user
     #                         -> image, etc
     mongo_client = MongoClient("mongodb://localhost:27017")
-    db = mongo_client["appName"]
+    db = mongo_client["CSE312"]
     users_collection = db["user"]
     return users_collection
 

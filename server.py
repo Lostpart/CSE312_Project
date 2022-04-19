@@ -4,6 +4,8 @@ import sys
 from flask import Flask
 from flask_socketio import SocketIO
 
+from manager import *
+
 app = Flask(__name__, static_url_path='')
 # Python Socket code from 2019 Spring CSE 116
 socket_server = SocketIO(app, cors_allowed_origins='*')
@@ -12,6 +14,10 @@ socket_server = SocketIO(app, cors_allowed_origins='*')
 @app.route("/")
 def index():
     return app.send_static_file("index.html")
+
+@app.route("/login")
+def home_login(email, password):
+    login(email, password)
 
 
 @socket_server.on('connect')
