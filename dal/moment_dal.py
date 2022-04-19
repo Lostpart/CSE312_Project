@@ -1,3 +1,4 @@
+import pymongo
 from bson import ObjectId
 
 
@@ -9,7 +10,7 @@ def insert(user_id: ObjectId, content: str, image_list, moment_collection):
 
 
 def get_recent_moments(moment_collection, limit=1000):
-    return moment_collection.find().sort({"_id": -1}).limit(limit)
+    return moment_collection.find({}, sort=[("_id", pymongo.DESCENDING)]).limit(limit)
 
 
 def like_moment(moment_id: ObjectId, moment_collection):
