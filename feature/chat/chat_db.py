@@ -42,7 +42,7 @@ def chat_history(data, chat_collection):  # chat history
         chat_tmp_collection.insert_one(data)
 
     # get all chat sort by timestamp in _id
-    final_answer = chat_tmp_collection.find({}).sort([['_id', 1]]).limit(50)
+    final_answer = chat_tmp_collection.find({}).sort([['_id', 1]]).limit(100)
     for i in final_answer:  # change to return format
         del i["_id"]
         i["from"] = str(i["from"])

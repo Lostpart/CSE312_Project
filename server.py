@@ -26,7 +26,7 @@ def test_send_chat():
     return "success"
 
 
-@app.route("/chathistory")
+@app.route("/chatHistory")
 def chat_history():
     data = json.loads(request.get_data(as_text=True))
     chat_collection = connect_database.connect_databases(["chat"])  # connect db
