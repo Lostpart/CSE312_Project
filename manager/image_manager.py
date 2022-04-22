@@ -27,5 +27,5 @@ def add_image(user_id: ObjectId, image_data: bytes, image_type: str, image_colle
     return image_dal.insert(ObjectId(user_id), image_filename, image_collection).inserted_id
 
 
-def get_image_name(image_id: ObjectId, image_collection):
+def get_image_filename(image_id: ObjectId, image_collection):
     return image_dal.get_image_by_image_id(image_id, image_collection)["filename"]
