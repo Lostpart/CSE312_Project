@@ -12,33 +12,29 @@ def create(displayName: str, email:str, password: str):
     current_time = get_current_time()
     user_dict = {"displayName": displayName, "email": email, "password": password, "last_update_time": current_time}
     users_collection.insert_one(user_dict)
-    result_dic = {}
+    fields = ["displayName", "email"]
+    result_dic = construct_return_dict(user_dict, fields)
     result_dic["user_id"] = str(user_dict["_id"])
-    result_dic["displayName"] = user_dict["displayName"]
-    result_dic["email"] = user_dict["email"]
     return result_dic
 
 
 def get_user(id = None, email: str = None, password: str = None):
     # 用户登录时我们并不知道id，所以必须用email来查询
+    # id和email至少要有一个
     users_collection = connect_user_DB()
     user_dict = None
-    # print(id, email, password)
     if id is not None:
-        user_dict = users_collection.find_one({"_id": id}, {"last_update_time": 0})
-        # print(user_dict)
+        user_dict = users_collection.find_one({"_id": id}, {"last_update_time": 0, "password": 0})
     elif email is not None and password is not None:
-        user_dict = users_collection.find_one({"email": email, "password": password}, {"last_update_time": 0})
-        # print(user_dict)
+        user_dict = users_collection.find_one({"email": email, "password": password}, {"last_update_time": 0, "password": 0})
     elif email is not None:
-        user_dict = users_collection.find_one({"email": email}, {"last_update_time": 0})
+        user_dict = users_collection.find_one({"email": email}, {"last_update_time": 0, "password": 0})
     else:
         error_message = "information missing"
         return construct_return_message(False, error_message)
     if user_dict:
         user_dict["user_id"] = str(user_dict["_id"])
         user_dict.pop("_id")
-        user_dict.pop("password")
         userInfo = user_dict
         return construct_return_message(True, userInfo)
         # else:
@@ -75,16 +71,34 @@ def delete_user(id: object):
     
 def connect_user_DB():
     # I'm using localhost. If you're using remote server, please change MongoClient in your need
-    # Data formmater: appName -> user
+    # Data formmater: CSE312 -> user
     #                         -> image, etc
     mongo_client = MongoClient("mongodb://localhost:27017")
     db = mongo_client["CSE312"]
     users_collection = db["user"]
     return users_collection
 
+def drop_table(table: str):
+    mongo_client = MongoClient("mongodb://localhost:27017")
+    db = mongo_client["CSE312"]
+    if table in db.list_collection_names():
+        expect_table = db[table]
+        expect_table.drop()
+        # message = "Table " + table + "dropped"
+        return True
+    else:
+        error_message = "Table " + table + " doesn't exist"
+        return error_message
+
 def construct_return_message(status, message):
     return_message_dict = {"status": status, "message": message}
     return return_message_dict
+
+def construct_return_dict(user_dict, fields):
+    return_dict = {}
+    for field in fields:
+        return_dict[field] = user_dict[field]
+    return return_dict
 
 def get_current_time():
     # Get current time as time Object. 
