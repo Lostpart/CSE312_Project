@@ -112,7 +112,8 @@ export default {
       links: [
             ['mdi-message-text', 'Messages', '/messages'],
             ['mdi-account-multiple', 'Square', '/about'],
-            ['mdi-account-multiple-plus', 'Sign Up', '/signup'],
+            ['mdi-account-multiple-plus', 'Register', '/register'],
+            ['mdi-account-multiple-plus', 'Log In', '/login'],
       ]}),
     methods: {
       reserve () {
@@ -121,7 +122,7 @@ export default {
       },
     },
     mounted(){
-      const socket = io('http://localhost:8080',{
+      const socket = io('http://127.0.0.1:8080',{
         transports: ['websocket','polling'],
       })
 

@@ -1,16 +1,16 @@
 <template>
     <v-card elevation="2" width="500" style="padding:30px">
-      <RegisterForm></RegisterForm>
+      <LoginForm></LoginForm>
     </v-card>
 </template>
 
 <script>
-import RegisterForm from "@/components/RegisterForm.vue";
+import LoginForm from "@/components/LoginForm.vue";
 
 export default {
-  name: "RegisterView",
+  name: "LoginView",
   components: {
-    RegisterForm,
+    LoginForm,
   },
 };
 </script>
