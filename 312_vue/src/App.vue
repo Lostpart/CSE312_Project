@@ -51,9 +51,9 @@
     </v-navigation-drawer>
     <!-- </v-navigation-drawer> -->
 
-    <v-app-bar app>
+    <!-- <v-app-bar app>
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-    </v-app-bar>
+    </v-app-bar> -->
     <v-main>
       <v-container fluid>
         <router-view></router-view>
@@ -63,10 +63,10 @@
     <v-footer
       app
       color="transparent"
-      height="72"
+      height="40"
       inset
     >
-    <div class="text-center ma-2">
+    <div class="text-center">
       <v-btn
         dark
         @click="snackbar = true"
@@ -111,7 +111,10 @@ export default {
       drawer: null,
       links: [
             ['mdi-message-text', 'Messages', '/messages'],
-            ['mdi-account-multiple', 'Square', '/about'],
+            ['mdi-account-multiple', 'Square', '/square'],
+            ['mdi-account-plus', 'Register', '/register'],
+            ['mdi-account', 'Log In', '/login'],
+            ['mdi-electron-framework', 'Moments', '/moments']
       ]}),
     methods: {
       reserve () {
@@ -120,9 +123,10 @@ export default {
       },
     },
     mounted(){
-      const socket = io('http://localhost:8080',{
+      const socket = io('http://127.0.0.1:8080',{
         transports: ['websocket','polling'],
       })
+
       socket.on("connect_error", (err) => {
         this.text = err
         this.snackbar = true
