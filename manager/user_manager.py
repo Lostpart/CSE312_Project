@@ -7,11 +7,12 @@ def login(email, password):
     # Return true is the user doesn't exist, return user infomation if the user exist
     message = userDB.get_user(None, email, password)
     if not message["status"]:
+        message["status"] = "Error"
         return json.dumps(message)
     elif message["status"]:
         return json.dumps(message["message"])
 
-def register(username, email, password):
+def register(displayName, email, password):
     # Check if email exist, then check email formmat. If both pass, create the user
     status_message = userDB.get_user(None, email)
     status = status_message["status"]
@@ -27,7 +28,7 @@ def register(username, email, password):
         error_message = "password can't be empty"
         return userDB.construct_return_message("Error", error_message)
     else:
-        userInfor = userDB.create(username, email, password)
+        userInfor = userDB.create(displayName, email, password)
         # print("Inserted user: " + username + " " + email + " " + password)
         return json.dumps(userInfor)
     # return False
