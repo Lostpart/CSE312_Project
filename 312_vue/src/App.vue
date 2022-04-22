@@ -112,6 +112,7 @@ export default {
       links: [
             ['mdi-message-text', 'Messages', '/messages'],
             ['mdi-account-multiple', 'Square', '/about'],
+            ['mdi-account-multiple-plus', 'Sign Up', '/signup'],
       ]}),
     methods: {
       reserve () {
@@ -123,6 +124,7 @@ export default {
       const socket = io('http://localhost:8080',{
         transports: ['websocket','polling'],
       })
+
       socket.on("connect_error", (err) => {
         this.text = err
         this.snackbar = true
