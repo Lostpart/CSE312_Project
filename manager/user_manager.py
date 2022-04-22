@@ -36,12 +36,9 @@ def register(username, email, password, users_collection):
 
 def checkEmailFormat(email: str):
     # Check if anything before @ is from a-z and 0-9 and if anything after @ is a-z and must have atleast 2 characters
-    return re.search("^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$", email)
+    return re.search("^([a-z0-9_.-]+)@([\da-z.-]+)\.([a-z.]{2,6})$", email)
 
 
 def get_user_by_id(id, user_collection):
-    return user_dal.get_user(user_collection, id=id)
-
-
-def get_user_by_email(email, user_collection):
-    return user_dal.get_user(user_collection, email=email)
+    # return user_dal.get_user(user_collection, id=id)
+    return  user_dal.get_user_by_id(id, user_collection)

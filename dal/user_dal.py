@@ -44,6 +44,10 @@ def get_user(user_collection, id=None, email: str = None, password: str = None):
         error_message = "User not found"
         return construct_return_message(False, error_message)
 
+def get_user_by_id(id, user_collection):
+    # 哥们，DAL写的太复杂了
+    return user_collection.find_one({"_id": id})
+
 
 def update_user(user_collection, id: object, email: str = None, display_name: str = None, password: str = None):
     # Not modified yet
