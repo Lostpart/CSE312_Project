@@ -19,14 +19,14 @@ def register(displayName, email, password):
     if  status:
         # print("A account with this email already exist")
         error_message = "A account with this email already exist."
-        return userDB.construct_return_message("Error", error_message)
+        return json.dumps(userDB.construct_return_message("Error", error_message))
     elif not check_email_format(email):
         # print("The email formmat is wrong.")
         error_message = "The email formmat is wrong."
-        return userDB.construct_return_message("Error", error_message)
+        return json.dumps(userDB.construct_return_message("Error", error_message))
     elif password == "":
         error_message = "password can't be empty"
-        return userDB.construct_return_message("Error", error_message)
+        return json.dumps(userDB.construct_return_message("Error", error_message))
     else:
         userInfor = userDB.create(displayName, email, password)
         # print("Inserted user: " + username + " " + email + " " + password)
