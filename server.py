@@ -5,7 +5,8 @@ from flask import Flask
 from flask_socketio import SocketIO
 from flask import request
 
-from manager import user_manager as um
+from dal.connect_database import connect_databases
+from manager import user_manager
 
 app = Flask(__name__, static_url_path='')
 # Python Socket code from 2019 Spring CSE 116
@@ -16,13 +17,16 @@ socket_server = SocketIO(app, cors_allowed_origins='*')
 def index():
     return app.send_static_file("index.html")
 
-@app.route("/login", methods = ["POST"])
-def home_login():
-    return um.login(request.json['email'], request.json['password'])
 
-@app.route("/register", methods = ["POST"])
+@app.route("/login", methods=["POST"])
+def home_login():
+    return user_manager.login(request.json['email'], request.json['password'], user_collection)
+
+
+@app.route("/register", methods=["POST"])
 def home_register():
-    return um.register(request.json['displayName'], request.json['email'], request.json['password'])
+    return user_manager.register(request.json['displayName'], request.json['email'], request.json['password'],
+                                 user_collection)
 
 
 @socket_server.on('connect')
@@ -49,4 +53,12 @@ if __name__ == '__main__':
     port = 8080
     if len(sys.argv) >= 2:
         port = sys.argv[1]
+
+    collection_list = ["user", "chat", "image", "moment"]
+    db_list = connect_databases(collection_list)
+    user_collection = db_list[0]
+    chat_collection = db_list[1]
+    image_collection = db_list[2]
+    moment_collection = db_list[3]
+
     socket_server.run(app, host="0.0.0.0", port=port, debug=True)
