@@ -37,6 +37,17 @@ def chat_history():
 
 # -------------- socket_server ------------------
 
+@app.route("/login", methods=["POST"])
+def home_login():
+    return user_manager.login(request.json['email'], request.json['password'], user_collection)
+
+
+@app.route("/register", methods=["POST"])
+def home_register():
+    return user_manager.register(request.json['displayName'], request.json['email'], request.json['password'],
+                                 user_collection)
+
+
 @socket_server.on('connect')
 def test_connect():
     print('Client connected')
@@ -98,4 +109,12 @@ if __name__ == '__main__':
     port = 8080
     if len(sys.argv) >= 2:
         port = sys.argv[1]
+
+    collection_list = ["user", "chat", "image", "moment"]
+    db_list = connect_databases(collection_list)
+    user_collection = db_list[0]
+    chat_collection = db_list[1]
+    image_collection = db_list[2]
+    moment_collection = db_list[3]
+
     socket_server.run(app, host="0.0.0.0", port=port, debug=True)
