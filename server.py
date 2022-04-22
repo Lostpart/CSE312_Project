@@ -56,9 +56,9 @@ if __name__ == '__main__':
 
     collection_list = ["user", "chat", "image", "moment"]
     db_list = connect_databases(collection_list)
-    user_collection = db_list[0]
-    chat_collection = db_list[1]
-    image_collection = db_list[2]
-    moment_collection = db_list[3]
+    user_collection = db_list["user"]
+    chat_collection = db_list["chat"]
+    image_collection = db_list["image"]
+    moment_collection = db_list["moment"]
 
     socket_server.run(app, host="0.0.0.0", port=port, debug=True)

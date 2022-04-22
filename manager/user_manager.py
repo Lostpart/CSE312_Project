@@ -5,7 +5,7 @@ import json
 
 def login(email, password, users_collection):
     # Return true is the user doesn't exist, return user infomation if the user exist
-    message = user_dal.get_user(None, email, password)
+    message = user_dal.get_user(user_collection = users_collection, email = email, password = password)
     if not message["status"]:
         message["status"] = "Error"
         return json.dumps(message)
@@ -31,7 +31,7 @@ def register(username, email, password, users_collection):
         error_message = "password can't be empty"
         return json.dumps(user_dal.construct_return_message("Error", error_message))
     else:
-        userInfor = user_dal.create(username, email, password)
+        userInfor = user_dal.create(users_collection,username, email, password)
         # print("Inserted user: " + username + " " + email + " " + password)
         return json.dumps(userInfor)
     # return False
