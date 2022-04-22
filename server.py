@@ -3,8 +3,9 @@ import sys
 
 from flask import Flask
 from flask_socketio import SocketIO
+from flask import request
 
-from manager import *
+from manager import user_manager as um
 
 app = Flask(__name__, static_url_path='')
 # Python Socket code from 2019 Spring CSE 116
@@ -15,9 +16,13 @@ socket_server = SocketIO(app, cors_allowed_origins='*')
 def index():
     return app.send_static_file("index.html")
 
-@app.route("/login")
-def home_login(email, password):
-    login(email, password)
+@app.route("/login", methods = ["POST"])
+def home_login():
+    return um.login(request.json['email'], request.json['password'])
+
+@app.route("/register", methods = ["POST"])
+def home_register():
+    return um.register(request.json['displayName'], request.json['email'], request.json['password'])
 
 
 @socket_server.on('connect')
