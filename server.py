@@ -6,6 +6,8 @@ from flask_socketio import SocketIO
 
 from dal import connect_database, chat_db
 from chat import chat_controller
+from dal.connect_database import connect_databases
+from manager import user_manager
 
 app = Flask(__name__, static_url_path='')
 # Python Socket code from 2019 Spring CSE 116
@@ -17,20 +19,9 @@ def index():
     return app.send_static_file("index.html")
 
 
-@app.route("/sendchat", methods=["POST"])
-def test_send_chat():
-    data = json.loads(request.get_data(as_text=True))
-    mock_chat_collection = connect_database.connect_databases(["chat"])  # connect db
-    mock_chat_collection = mock_chat_collection["chat"]
-    receive = chat_db.send_chat(data, mock_chat_collection)
-    return "success"
-
-
 @app.route("/chatHistory")
 def chat_history():
     data = json.loads(request.get_data(as_text=True))
-    chat_collection = connect_database.connect_databases(["chat"])  # connect db
-    chat_collection = chat_collection["chat"]
     receive = chat_db.chat_history(data, chat_collection)
     return receive
 
