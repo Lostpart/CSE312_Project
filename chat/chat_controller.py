@@ -16,8 +16,8 @@ def controller(rawdata):
         chat_collection = connect_database.connect_databases(["chat"])  # connect db
         chat_collection = chat_collection["chat"]
         chat_db.send_chat(data, chat_collection, note)  # store chat into db
+        print("here3")
         to = data["to"]
-        join_room(to)
         print("Client→Python：{}".format(data))
         response = {"status": True, "message": data}  # send new chat
         # close db connection
