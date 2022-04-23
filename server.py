@@ -2,7 +2,7 @@ import json
 import sys
 
 from flask import Flask, request
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, join_room, leave_room
 
 from dal import connect_database, chat_db
 from chat import chat_controller
@@ -65,6 +65,7 @@ def send_chat(rawdata):
     if check:
         socket_server.emit('error', json.dumps(answer))
     else:
+        join_room(answer["to"])
         socket_server.emit('new_chat', json.dumps(answer["response"]), room=json.dumps(answer["to"]))
     pass
 
@@ -80,9 +81,10 @@ def send_moment(rawdata):
 def test_send_chat():
     data = json.loads(request.get_data(as_text=True))
     print(data)
+    image_check = False
     mock_chat_collection = connect_database.connect_databases(["test-chat"])  # connect db
     mock_chat_collection = mock_chat_collection["test-chat"]
-    receive = chat_db.send_chat(data, mock_chat_collection)
+    receive = chat_db.send_chat(data, mock_chat_collection, image_check)
     return "success"
 
 
@@ -95,6 +97,12 @@ def test_chat_history():
     mock_chat_collection.delete_many({})
     return receive
 
+@app.route("/test-controller", methods=["POST"])
+def test_chat_controller():
+    data = (request.get_data(as_text=True))
+    (a, b) = chat_controller.controller(data)
+    return json.dumps({"a": a, "b": b})
+
 
 if __name__ == '__main__':
     port = 8080
@@ -103,9 +111,9 @@ if __name__ == '__main__':
 
     collection_list = ["user", "chat", "image", "moment"]
     db_list = connect_databases(collection_list)
-    user_collection = db_list[0]
-    chat_collection = db_list[1]
-    image_collection = db_list[2]
-    moment_collection = db_list[3]
+    user_collection = db_list["user"]
+    chat_collection = db_list["chat"]
+    image_collection = db_list["image"]
+    moment_collection = db_list["moment"]
 
     socket_server.run(app, host="0.0.0.0", port=port, debug=True)

@@ -6,16 +6,18 @@ from manager import image_manager
 
 
 def send_chat(data, chat_collection, image_check):  # add chat
-    print(chat_collection)
+    print(data, chat_collection, image_check)
     from_user = data["from"]
     to_user = data["to"]
     message = data["message"]
     image_id = None
     if image_check:
+        print("here")
         image_data = data["image"]
-        image_id = image_manager.add_image_by_base64(image_data)
+        #image_id = image_manager.add_image_by_base64(from_user, image_data)
     chat_collection.insert_one(
         {"from": ObjectId(from_user), "to": ObjectId(to_user), "message": message, "image": image_id})
+    print("finish")
     return
 
 
