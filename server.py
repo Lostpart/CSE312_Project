@@ -62,7 +62,7 @@ def test_msg(rawdata):
 @socket_server.on('send_chat')
 def send_chat(rawdata):
     check, answer = chat_controller.controller(rawdata)
-    if check:
+    if check is False:
         socket_server.emit('error', json.dumps(answer))
     else:
         join_room(answer["to"])
