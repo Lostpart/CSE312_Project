@@ -101,7 +101,7 @@ def test_chat_history():
 def test_chat_controller():
     data = (request.get_data(as_text=True))
     (a, b) = chat_controller.controller(data)
-    return json.dumps({"a": a, "b": b})
+    return json.dumps(b)
 
 
 if __name__ == '__main__':

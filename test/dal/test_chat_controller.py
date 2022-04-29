@@ -11,20 +11,14 @@ class MyTestCase(unittest.TestCase):
         dict1 = {"from": "123456789012123456789012", "to": "123456789012123456789013", "message": "leile"}
         answer1 = requests.post(self.path, dict1)
         answer1 = answer1.json()
-        a = answer1["a"]
-        b = answer1["b"]
-        self.assertEqual(a, False)
-        self.assertEqual(b, {'status': 'error', 'message': 'rawdata is not json format'})
+        self.assertEqual(answer1, {'status': 'error', 'message': 'rawdata is not json format'})
         dict2 = {
             "from": "123456789012123456789012",
             "message": "leile"
         }
         answer2 = requests.post(self.path, json=dict2)
         answer2 = answer2.json()
-        a = answer2["a"]
-        b = answer2["b"]
-        self.assertEqual(a, False)
-        self.assertEqual(b, {'status': 'error', 'message': "'to' is not exists"})
+        self.assertEqual(answer2, {'status': 'error', 'message': "'to' is not exists"})
         dict3 = {
             "from": "123456789012123456789012",
             "to": "1234567890",
@@ -32,10 +26,7 @@ class MyTestCase(unittest.TestCase):
         }
         answer3 = requests.post(self.path, json=dict3)
         answer3 = answer3.json()
-        a = answer3["a"]
-        b = answer3["b"]
-        self.assertEqual(a, False)
-        self.assertEqual(b, {'status': 'error', 'message': 'to is not consistent with ObjectId format'})
+        self.assertEqual(answer3, {'status': 'error', 'message': 'to is not consistent with ObjectId format'})
         dict4 = {
             "from": "123456789012123456789012",
             "to": "123456789012123456789013",
@@ -44,10 +35,7 @@ class MyTestCase(unittest.TestCase):
         answer4 = requests.post(self.path, json=dict4)
         answer4 = answer4.json()
         print(answer4)
-        a = answer4["a"]
-        b = answer4["b"]
-        self.assertEqual(a, True)
-        self.assertEqual(b, {'response': {
+        self.assertEqual(answer4, {'response': {
             'message': {'from': '123456789012123456789012', 'message': 'leile', 'to': '123456789012123456789013'},
             'status': True}, 'to': '123456789012123456789013'})
 
