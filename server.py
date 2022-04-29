@@ -1,11 +1,13 @@
 import json
 import sys
 
-from flask import Flask
-from flask_socketio import SocketIO
-from flask import request
+from flask import Flask, request
+from flask_socketio import SocketIO, join_room, leave_room
 
-from manager import user_manager as um
+from dal import connect_database, chat_db
+from chat import chat_controller
+from dal.connect_database import connect_databases
+from manager import user_manager
 
 app = Flask(__name__, static_url_path='')
 # Python Socket code from 2019 Spring CSE 116
@@ -16,13 +18,25 @@ socket_server = SocketIO(app, cors_allowed_origins='*')
 def index():
     return app.send_static_file("index.html")
 
-@app.route("/login", methods = ["POST"])
-def home_login():
-    return um.login(request.json['email'], request.json['password'])
 
-@app.route("/register", methods = ["POST"])
+@app.route("/chatHistory")
+def chat_history():
+    data = json.loads(request.get_data(as_text=True))
+    receive = chat_db.chat_history(data, chat_collection)
+    return receive
+
+
+# -------------- socket_server ------------------
+
+@app.route("/login", methods=["POST"])
+def home_login():
+    return user_manager.login(request.json['email'], request.json['password'], user_collection)
+
+
+@app.route("/register", methods=["POST"])
 def home_register():
-    return um.register(request.json['displayName'], request.json['email'], request.json['password'])
+    return user_manager.register(request.json['displayName'], request.json['email'], request.json['password'],
+                                 user_collection)
 
 
 @socket_server.on('connect')
@@ -45,8 +59,65 @@ def test_msg(rawdata):
     pass
 
 
+@socket_server.on('send_chat')
+def send_chat(rawdata):
+    check, answer = chat_controller.controller(rawdata)
+    if check is False:
+        socket_server.emit('error', json.dumps(answer))
+    else:
+        join_room(answer["to"])
+        socket_server.emit('new_chat', json.dumps(answer["response"]), room=json.dumps(answer["to"]))
+    pass
+
+
+@socket_server.on('test_moment')
+def send_moment(rawdata):
+    # call moment function
+    socket_server.emit('test_moment', rawdata, broadcast=True)
+
+
+# ------------------ test_route -------------------
+@app.route("/test-sendchat", methods=["POST"])
+def test_send_chat():
+    data = json.loads(request.get_data(as_text=True))
+    print(data)
+    image_check = False
+    mock_chat_collection = connect_database.connect_databases(["test-chat"])  # connect db
+    mock_chat_collection = mock_chat_collection["test-chat"]
+    receive = chat_db.send_chat(data, mock_chat_collection, image_check)
+    return "success"
+
+
+@app.route("/test-getchat")
+def test_chat_history():
+    data = json.loads(request.get_data(as_text=True))
+    mock_chat_collection = connect_database.connect_databases(["test-chat"])  # connect db
+    mock_chat_collection = mock_chat_collection["test-chat"]
+    receive = chat_db.chat_history(data, mock_chat_collection)
+    mock_chat_collection.delete_many({})
+    return receive
+
+
+@app.route("/test-controller", methods=["POST"])
+def test_chat_controller():
+    data = (request.get_data(as_text=True))
+    (a, b) = chat_controller.controller(data)
+    if a is True:
+        return json.dumps(b["response"])
+    else:
+        return json.dumps(b)
+
+
 if __name__ == '__main__':
     port = 8080
     if len(sys.argv) >= 2:
         port = sys.argv[1]
+
+    collection_list = ["user", "chat", "image", "moment"]
+    db_list = connect_databases(collection_list)
+    user_collection = db_list["user"]
+    chat_collection = db_list["chat"]
+    image_collection = db_list["image"]
+    moment_collection = db_list["moment"]
+
     socket_server.run(app, host="0.0.0.0", port=port, debug=True)
