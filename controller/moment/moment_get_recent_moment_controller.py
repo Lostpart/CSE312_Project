@@ -9,7 +9,10 @@ def get_recent_moments_controller(payload, image_collection, moment_collection):
 
     limit = 100
 
-    data = json.loads(payload)
+    try:
+        data = json.loads(payload)
+    except json.decoder.JSONDecodeError:
+        return on_fail("Invalid input: Not a JSON string")
 
     if "limit" in data:
         limit = data["limit"]

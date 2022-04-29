@@ -62,6 +62,19 @@ def test_disconnect():
     print('Client disconnected')
 
 
+@socket_server.on('moment_like')
+def moment_like(payload):
+    try:
+        result = moment_like.moment_like_controller(payload)
+    except ValueError as err:
+        data = {"status": "error", "message": err}
+        socket_server.send(json.dumps(data))
+        return
+
+    sending_json = json.dumps(result)
+    socket_server.emit(sending_json, broadcast=True)
+
+
 @socket_server.on('test_msg')
 def test_msg(rawdata):
     # rawdata = str(request.data)
@@ -80,12 +93,6 @@ def send_chat(rawdata):
         join_room(answer["to"])
         socket_server.emit('new_chat', json.dumps(answer["response"]), room=json.dumps(answer["to"]))
     pass
-
-
-@socket_server.on('test_moment')
-def send_moment(rawdata):
-    # call moment function
-    socket_server.emit('test_moment', rawdata, broadcast=True)
 
 
 # ------------------ test_route -------------------

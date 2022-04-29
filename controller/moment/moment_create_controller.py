@@ -6,7 +6,11 @@ from manager.moment_manager import create_moment
 def create_controller(payload, image_collection, moment_collection):
     if payload is None:
         return on_fail("Invalid input: No payload")
-    data = json.loads(payload)
+    try:
+        data = json.loads(payload)
+    except json.decoder.JSONDecodeError:
+        return on_fail("Invalid input: Not a JSON string")
+
     if "user_id" not in data:
         return on_fail("Invalid input: user_id missing")
     if "content" not in data:

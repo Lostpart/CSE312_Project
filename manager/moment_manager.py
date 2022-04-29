@@ -43,5 +43,7 @@ def get_recent_moments(image_collection, moment_collection, limit=10):
 
 def like_moment(moment_id, moment_collection):
     db_result = moment_dal.like_moment(ObjectId(moment_id), moment_collection)
+    if db_result is None:
+        raise LookupError("Can't find given moment")
     return db_result
 
