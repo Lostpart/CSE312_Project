@@ -66,7 +66,7 @@ def send_chat(rawdata):
         socket_server.emit('error', json.dumps(answer))
     else:
         join_room(rawdata["to"])
-        socket_server.emit('new_chat', json.dumps(answer["response"]['message']), room=rawdata["from"])
+        socket_server.emit('new_chat', json.dumps(answer["response"]['message']), room=rawdata["to"])
     pass
 
 
