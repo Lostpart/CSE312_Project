@@ -62,7 +62,7 @@ def test_msg(rawdata):
 @socket_server.on('send_chat')
 def send_chat(rawdata):
     check, answer = chat_controller.controller(rawdata)
-    if check:
+    if check is False:
         socket_server.emit('error', json.dumps(answer))
     else:
         join_room(answer["to"])
@@ -97,11 +97,15 @@ def test_chat_history():
     mock_chat_collection.delete_many({})
     return receive
 
+
 @app.route("/test-controller", methods=["POST"])
 def test_chat_controller():
     data = (request.get_data(as_text=True))
     (a, b) = chat_controller.controller(data)
-    return json.dumps({"a": a, "b": b})
+    if a is True:
+        return json.dumps(b["response"])
+    else:
+        return json.dumps(b)
 
 
 if __name__ == '__main__':
