@@ -97,11 +97,15 @@ def test_chat_history():
     mock_chat_collection.delete_many({})
     return receive
 
+
 @app.route("/test-controller", methods=["POST"])
 def test_chat_controller():
     data = (request.get_data(as_text=True))
     (a, b) = chat_controller.controller(data)
-    return json.dumps(b)
+    if a is True:
+        return json.dumps(b["response"])
+    else:
+        return json.dumps(b)
 
 
 if __name__ == '__main__':

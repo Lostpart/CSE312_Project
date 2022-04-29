@@ -35,9 +35,8 @@ class MyTestCase(unittest.TestCase):
         answer4 = requests.post(self.path, json=dict4)
         answer4 = answer4.json()
         print(answer4)
-        self.assertEqual(answer4, {'response': {
-            'message': {'from': '123456789012123456789012', 'message': 'leile', 'to': '123456789012123456789013'},
-            'status': True}, 'to': '123456789012123456789013'})
+        self.assertEqual(answer4, {'message': {'from': '123456789012123456789012', 'message': 'leile', 'to': '123456789012123456789013'},
+            'status': True})
 
 
 if __name__ == '__main__':
