@@ -26,7 +26,8 @@ def get_user(user_collection, id=None, email: str = None, password: str = None):
     if id is not None:
         user_dict = user_collection.find_one({"_id": id}, {"last_update_time": 0, "password": 0})
     elif email is not None and password is not None:
-        user_dict = user_collection.find_one({"email": email, "password": password}, {"last_update_time": 0, "password": 0})
+        user_dict = user_collection.find_one({"email": email, "password": password},
+                                             {"last_update_time": 0, "password": 0})
     elif email is not None:
         user_dict = user_collection.find_one({"email": email}, {"last_update_time": 0, "password": 0})
     else:
@@ -43,6 +44,7 @@ def get_user(user_collection, id=None, email: str = None, password: str = None):
     else:
         error_message = "User not found"
         return construct_return_message(False, error_message)
+
 
 def get_user_by_id(id, user_collection):
     # 哥们，DAL写的太复杂了
@@ -73,7 +75,8 @@ def update_user(user_collection, id: object, email: str = None, display_name: st
 
 def delete_user(id: object):
     return 0
-    
+
+
 def connect_user_DB():
     # I'm using localhost. If you're using remote server, please change MongoClient in your need
     # Data formmater: CSE312 -> user
@@ -82,6 +85,7 @@ def connect_user_DB():
     db = mongo_client["CSE312"]
     users_collection = db["user"]
     return users_collection
+
 
 def drop_table(table: str):
     mongo_client = MongoClient("mongodb://localhost:27017")
@@ -95,15 +99,18 @@ def drop_table(table: str):
         error_message = "Table " + table + " doesn't exist"
         return error_message
 
+
 def construct_return_message(status, message):
     return_message_dict = {"status": status, "message": message}
     return return_message_dict
+
 
 def construct_return_dict(user_dict, fields):
     return_dict = {}
     for field in fields:
         return_dict[field] = user_dict[field]
     return return_dict
+
 
 def get_current_time():
     # Get current time as time Object. 

@@ -3,9 +3,9 @@ from dal import user_dal
 import json
 
 
-def login(email, password, users_collection):
+def login(email, password, user_collection):
     # Return true is the user doesn't exist, return user infomation if the user exist
-    message = user_dal.get_user(user_collection = users_collection, email = email, password = password)
+    message = user_dal.get_user(user_collection = user_collection, email = email, password = password)
     if not message["status"]:
         message["status"] = "Error"
         return json.dumps(message)
@@ -15,9 +15,9 @@ def login(email, password, users_collection):
         return json.dumps(message)
 
 
-def register(username, email, password, users_collection):
+def register(username, email, password, user_collection):
     # Check if email exist, then check email formmat. If both pass, create the user
-    status_message = user_dal.get_user(users_collection, email=email)
+    status_message = user_dal.get_user(user_collection, email=email)
     status = status_message["status"]
     if status:
         # print("A account with this email already exist")
@@ -31,7 +31,7 @@ def register(username, email, password, users_collection):
         error_message = "password can't be empty"
         return json.dumps(user_dal.construct_return_message("Error", error_message))
     else:
-        userInfor = user_dal.create(users_collection,username, email, password)
+        userInfor = user_dal.create(user_collection, username, email, password)
         # print("Inserted user: " + username + " " + email + " " + password)
         return json.dumps(userInfor)
     # return False
