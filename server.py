@@ -73,6 +73,7 @@ def moment_like(payload):
 
     sending_json = json.dumps(result)
     socket_server.emit(sending_json, broadcast=True)
+    return
 
 
 @socket_server.on('test_msg')
@@ -81,7 +82,6 @@ def test_msg(rawdata):
     print("Client→Python：{}".format(rawdata))
     response = json.dumps({"msg_type": "test_msg", "msg": rawdata})
     socket_server.emit('test_msg', response)
-    pass
 
 
 @socket_server.on('send_chat')
@@ -92,7 +92,7 @@ def send_chat(rawdata):
     else:
         join_room(answer["to"])
         socket_server.emit('new_chat', json.dumps(answer["response"]), room=json.dumps(answer["to"]))
-    pass
+    return
 
 
 # ------------------ test_route -------------------
