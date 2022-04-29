@@ -8,7 +8,8 @@ from dal.user_dal import *
 class UnitTesting(unittest.TestCase):
     def setUp(self):
         mongo_client = mongomock.MongoClient()
-        self.user_collection = mongo_client["CSE312"]["user"]
+        self.database = mongo_client["CSE312"]
+        self.user_collection = self.database["user"]
 
     def test_create(self):
         # Test create a user with proper format
@@ -18,7 +19,7 @@ class UnitTesting(unittest.TestCase):
         self.assertEqual(test_result["email"], self.user[0][1])
         self.assertTrue("user_id" in test_result.keys())
         self.assertTrue(test_result["user_id"] != "")
-        message = drop_table("user")
+        message = drop_table(self.database, "user")
         self.assertTrue(message)
 
     def test_get_user(self):
@@ -39,7 +40,7 @@ class UnitTesting(unittest.TestCase):
         # Get a existed user by email and password
         test_result = get_user(self.user_collection, None, self.user[0][1], self.user[0][2])
         self.assertEqual(test_result, {'status': True, 'message': {'displayName': 'howie', 'email': 'howie@gmail.com', 'user_id': temp_user["user_id"]}})
-        message = drop_table("user")
+        message = drop_table(self.database, "user")
         self.assertTrue(message)
 
     def test_update(self):
