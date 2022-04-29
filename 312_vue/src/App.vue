@@ -88,6 +88,7 @@ export default {
 			['mdi-account-plus', 'Register', '/register'],
 			['mdi-account', 'Log In', '/login'],
 			['mdi-electron-framework', 'Moments', '/moments'],
+			['mdi-minus', 'Game', '/tictactoe'],
 		],
 	}),
 	methods: {
