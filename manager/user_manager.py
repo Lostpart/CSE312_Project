@@ -36,6 +36,12 @@ def register(username, email, password, user_collection):
         return json.dumps(userInfor)
     # return False
 
+def get_all_user(users_collection):
+    """ Return user list in json format like this
+        {id: {"displayName": displayName, "email": email}, .......}
+    """
+    return json.dumps(user_dal.retrieve_all(users_collection))
+
 
 def check_email_format(email: str):
     # Check if anything before @ is from a-z and 0-9 and if anything after @ is a-z and must have atleast 2 characters

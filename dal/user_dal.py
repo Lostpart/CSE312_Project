@@ -76,28 +76,34 @@ def update_user(user_collection, id: object, email: str = None, display_name: st
 def delete_user(id: object):
     return 0
 
+def retrieve_all(user_collection):
+    all_users_with_object_id = list(user_collection.find({}, {"password": 0, "last_update_time": 0}))
+    all_users = {}
+    for user in all_users_with_object_id:
+        temp_user = user
+        id =  str(user["_id"])
+        temp_user.pop("_id")
+        all_users[id] = temp_user
+    return all_users
+    
+# def connect_user_DB():
+#     # I'm using localhost. If you're using remote server, please change MongoClient in your need
+#     # Data formmater: CSE312 -> user
+#     #                         -> image, etc
+#     mongo_client = MongoClient("mongodb://localhost:27017")
+#     db = mongo_client["CSE312"]
+#     users_collection = db["user"]
+#     return users_collection
 
-def connect_user_DB():
-    # I'm using localhost. If you're using remote server, please change MongoClient in your need
-    # Data formmater: CSE312 -> user
-    #                         -> image, etc
-    mongo_client = MongoClient("mongodb://localhost:27017")
-    db = mongo_client["CSE312"]
-    users_collection = db["user"]
-    return users_collection
-
-
-def drop_table(table: str):
-    mongo_client = MongoClient("mongodb://localhost:27017")
-    db = mongo_client["CSE312"]
-    if table in db.list_collection_names():
-        expect_table = db[table]
-        expect_table.drop()
-        # message = "Table " + table + "dropped"
-        return True
-    else:
-        error_message = "Table " + table + " doesn't exist"
-        return error_message
+# def drop_table(database, table: str):
+#     if table in database.list_collection_names():
+#         expect_table = database[table]
+#         expect_table.drop()
+#         # message = "Table " + table + "dropped"
+#         return True
+#     else:
+#         error_message = "Table " + table + " doesn't exist"
+#         return error_message
 
 
 def construct_return_message(status, message):

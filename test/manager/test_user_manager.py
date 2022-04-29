@@ -3,11 +3,13 @@ import mongomock
 
 from manager.user_manager import *
 from dal.user_dal import *
+from test.test_utils import drop_table
 
 class UnitTesting(unittest.TestCase):
     def setUp(self):
         mongo_client = mongomock.MongoClient()
-        self.user_collection = mongo_client["CSE312"]["user"]
+        self.database = mongo_client["CSE312"]
+        self.user_collection = self.database["user"]
 
     def test_register(self):
         # Register a normal user
@@ -27,7 +29,8 @@ class UnitTesting(unittest.TestCase):
         # Register a user with empty password
         test_user = json.loads(register(self.user[5][0], self.user[5][1], self.user[5][2], self.user_collection))
         self.assertEqual(test_user, {'status': 'Error', 'message': "password can't be empty"})
-        message = drop_table("user")
+
+        message = drop_table(self.database, "user")
         self.assertTrue(message)
 
     def test_login(self):
@@ -58,8 +61,39 @@ class UnitTesting(unittest.TestCase):
         test_user = json.loads(login("", self.user[6][2], self.user_collection))
         self.assertEqual(test_user, {'status': 'Error', 'message': 'User not found'})
 
-        message = drop_table("user")
+        message = drop_table(self.database, "user")
         self.assertTrue(message)
+
+    def test_get_all(self):
+        # Test when there is no user in database
+        user_list = json.loads(get_all_user(self.user_collection))
+        self.assertEqual(user_list, {})
+
+        # Test when there is one user
+        test_user1 = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2], self.user_collection))
+        test_id1 = test_user1["user_id"]
+        user_list = json.loads(get_all_user(self.user_collection))
+        self.assertEqual(user_list, {test_id1: {"displayName": "howie", "email": "howie@gmail.com"}})
+
+        # Test when there are more than one user, which are two users
+        test_user2 = json.loads(register(self.user[1][0], self.user[1][1], self.user[1][2], self.user_collection))
+        test_id2 = test_user2["user_id"]
+        user_list = json.loads(get_all_user(self.user_collection))
+        self.assertEqual(user_list, {test_id1: {'displayName': 'howie', 'email': 'howie@gmail.com'}, test_id2: {'displayName': 'shouyue', 'email': 'shoouyue@email.com'}})
+
+        # Drop table at the end
+        message = drop_table(self.database, "user")
+        self.assertTrue(message)
+    
+    def drop_table(database, table: str):
+        if table in database.list_collection_names():
+            expect_table = database[table]
+            expect_table.drop()
+            # message = "Table " + table + "dropped"
+            return True
+        else:
+            error_message = "Table " + table + " doesn't exist"
+        return error_message
 
     # Corret part
     username1 = "howie"
