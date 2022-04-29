@@ -5,7 +5,12 @@
 			<v-col cols="4">
 				<v-switch v-model="onlyActiveSwitch" label="Only active users"></v-switch>
 				<v-list subheader max-height="10" v-if="updated">
-					<v-list-item v-for="user in usersListWithAvatarName" :key="user.user_id" link v-show="user.active || !onlyActiveSwitch">
+					<v-list-item
+						v-for="user in usersListWithAvatarName"
+						:key="user.user_id"
+						link
+						v-show="user.active || !onlyActiveSwitch"
+					>
 						<v-list-item-avatar color="blue">
 							<span class="white--text text-h5">{{ user.avatarName }}</span>
 						</v-list-item-avatar>
@@ -15,17 +20,23 @@
 						</v-list-item-content>
 
 						<v-list-item-icon>
-							<v-icon :color="user.active ? 'deep-purple accent-4' : 'grey'"> mdi-message-outline </v-icon>
+							<v-icon :color="user.active ? 'deep-purple accent-4' : 'grey'">
+								mdi-message-outline
+							</v-icon>
 						</v-list-item-icon>
 					</v-list-item>
 				</v-list>
 			</v-col>
 			<v-col v-show="isClicked">
-				<v-toolbar color="blue" dark>
+				<v-toolbar :color="`${this.isCurrentFriendActive ? 'blue' : 'grey'}`" dark>
 					<v-toolbar-title>{{ currentFriendDisplayName }}</v-toolbar-title>
 				</v-toolbar>
-				<div id="chatView" style="height: 380px" class="overflow-y-auto overflow-x-hidden">
-					<v-sheet color="white" elevation="1" min-height="300" width="100%">
+				<div
+					id="chatView"
+					style="height: 380px"
+					class="overflow-y-auto overflow-x-hidden"
+				>
+					<v-sheet color="white" min-height="300" width="100%">
 						<div v-for="(chat, idx) in currentHistory" :key="idx">
 							<v-row>
 								<v-col>
@@ -47,7 +58,13 @@
 					</v-sheet>
 				</div>
 				<v-sheet color="white" width="100%">
-					<v-textarea name="input-7-1" filled label="Message" placeholder="Enter message here" v-model="currentSentence">
+					<v-textarea
+						name="input-7-1"
+						filled
+						label="Message"
+						placeholder="Enter message here"
+						v-model="currentSentence"
+					>
 					</v-textarea>
 					<v-btn style="float: right" @click="sendMsg">
 						SEND
@@ -60,65 +77,76 @@
 </template>
 
 <script>
-	export default {
-		components: {},
-		data: () => ({
-			updated: true,
-			onlyActiveSwitch: false,
-			currentFriend: '',
-			currentFriendDisplayName: '',
-			currentSentence: '',
-			currentFriendUserID: null,
-			isClicked: false,
-			currentHistory: [],
-		}),
-		computed: {
-			usersListWithAvatarName() {
-				const usersList = this.$store.state.user.usersList.filter((user) => user.user_id !== this.$store.state.user.userID)
-				if (!usersList) return []
-				else {
-					for (let i = 0; i < usersList.length; i++) {
-						usersList[i]['avatarName'] = usersList[i]['displayName'].substring(0, 1).toUpperCase()
-					}
+export default {
+	components: {},
+	data: () => ({
+		updated: true,
+		onlyActiveSwitch: false,
+		isCurrentFriendActive: false,
+		currentFriend: '',
+		currentFriendDisplayName: '',
+		currentSentence: '',
+		currentFriendUserID: null,
+		isClicked: false,
+		currentHistory: [],
+	}),
+	computed: {
+		usersListWithAvatarName() {
+			const usersList = this.$store.state.user.usersList.filter(
+				(user) => user.user_id !== this.$store.state.user.userID
+			)
+			if (!usersList) return []
+			else {
+				for (let i = 0; i < usersList.length; i++) {
+					usersList[i]['avatarName'] = usersList[i]['displayName']
+						.substring(0, 1)
+						.toUpperCase()
 				}
-				return usersList
-			},
+			}
+			return usersList
 		},
-		watch: {
-			currentHistory() {
-				this.updated = false
-				this.$nextTick(() => {
-					this.updated = true
-				})
-			},
+	},
+	watch: {
+		currentHistory() {
+			this.updated = false
+			this.$nextTick(() => {
+				this.updated = true
+			})
 		},
-		methods: {
-			changeCurrentFriend(user) {
-				this.currentFriendUserID = user.user_id
-				this.currentFriendDisplayName = user.displayName
-				// this.currentHistory = chat.history
-				this.isClicked = true
-				this.currentSentence = ''
+	},
+	methods: {
+		changeCurrentFriend(user) {
+			this.currentFriendUserID = user.user_id
+			this.currentFriendDisplayName = user.displayName
+			this.isCurrentFriendActive = user.active
+			this.isClicked = true
+			this.currentSentence = ''
 
-				const res = this.$store.state.user.chatHistory[this.currentFriendUserID]
-				if (!res || res.length == 0) this.currentHistory = []
-				else this.currentHistory = res
-			},
-			sendMsg() {
-				const chatObj = { from: this.$store.state.user.userID, to: this.currentFriendUserID, message: this.currentSentence }
-				this.$store.commit('addChatHistory', {
-					incoming: false,
-					data: chatObj,
-				})
-				this.$store.state.user.webSocket.emit('send_chat', chatObj)
-				this.currentSentence = ''
-			},
-		},
-		mounted(){
-			setInterval(()=>{
+			const res = this.$store.state.user.chatHistory[this.currentFriendUserID]
+			if (!res || res.length == 0) this.currentHistory = []
+			else this.currentHistory = res
+			setTimeout(() => {
 				const chatView = document.getElementById('chatView')
 				chatView.scrollTop = chatView.scrollHeight
-			}, 100)
-		}
-	}
+			}, 1)
+		},
+		sendMsg() {
+			const chatObj = {
+				from: this.$store.state.user.userID,
+				to: this.currentFriendUserID,
+				message: this.currentSentence,
+			}
+			this.$store.commit('addChatHistory', {
+				incoming: false,
+				data: chatObj,
+			})
+			this.$store.state.user.webSocket.emit('send_chat', chatObj)
+			this.currentSentence = ''
+			setTimeout(() => {
+				const chatView = document.getElementById('chatView')
+				chatView.scrollTop = chatView.scrollHeight
+			}, 50)
+		},
+	},
+}
 </script>

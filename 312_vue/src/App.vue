@@ -11,7 +11,9 @@
 					</v-list-item>
 					<v-list-item link>
 						<v-list-item-content>
-							<v-list-item-title class="text-h6"> {{ this.$store.state.user.displayName }} </v-list-item-title>
+							<v-list-item-title class="text-h6">
+								{{ this.$store.state.user.displayName }}
+							</v-list-item-title>
 						</v-list-item-content>
 
 						<v-list-item-action>
@@ -47,7 +49,9 @@
 					{{ text }}
 
 					<template v-slot:action="{ attrs }">
-						<v-btn color="pink" text v-bind="attrs" @click="snackbar = false"> Close </v-btn>
+						<v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
+							Close
+						</v-btn>
 					</template>
 				</v-snackbar>
 			</div>
@@ -56,94 +60,99 @@
 </template>
 
 <script>
-	import { io } from 'socket.io-client'
-	import axios from 'axios'
+import { io } from 'socket.io-client'
+import axios from 'axios'
 
-	export default {
-		name: 'App',
-		components: {
-			// HelloWorld,
-			// CardsStack,
-			// DashBoard
+export default {
+	name: 'App',
+	components: {
+		// HelloWorld,
+		// CardsStack,
+		// DashBoard
+	},
+	computed: {
+		currentUserAvatarName() {
+			const displayName = this.$store.state.user.displayName
+			if (displayName && displayName.length > 0)
+				return displayName.substring(0, 1).toUpperCase()
+			return ''
 		},
-		computed: {
-			currentUserAvatarName() {
-				const displayName = this.$store.state.user.displayName
-				if (displayName && displayName.length > 0) return displayName.substring(0, 1).toUpperCase()
-				return ''
-			},
+	},
+	data: () => ({
+		snackbar: false,
+		text: '',
+		drawer: null,
+		links: [
+			['mdi-message-text', 'Messages', '/messages'],
+			['mdi-account-multiple', 'Square', '/square'],
+			['mdi-account-plus', 'Register', '/register'],
+			['mdi-account', 'Log In', '/login'],
+			['mdi-electron-framework', 'Moments', '/moments'],
+		],
+	}),
+	methods: {
+		reserve() {
+			this.loading = true
+			setTimeout(() => (this.loading = false), 2000)
 		},
-		data: () => ({
-			snackbar: false,
-			text: '',
-			drawer: null,
-			links: [
-				['mdi-message-text', 'Messages', '/messages'],
-				['mdi-account-multiple', 'Square', '/square'],
-				['mdi-account-plus', 'Register', '/register'],
-				['mdi-account', 'Log In', '/login'],
-				['mdi-electron-framework', 'Moments', '/moments'],
-			],
-		}),
-		methods: {
-			reserve() {
-				this.loading = true
-				setTimeout(() => (this.loading = false), 2000)
-			},
-		},
-		mounted() {
-			const _this = this
-			const socket = io('http://127.0.0.1:8080', {
-				transports: ['websocket', 'polling'],
-			})
+	},
+	mounted() {
+		const _this = this
+		const socket = io('http://127.0.0.1:8080', {
+			transports: ['websocket', 'polling'],
+		})
 
-			socket.on('connect_error', (err) => {
-				this.text = err
-				this.snackbar = true
+		socket.on('connect_error', (err) => {
+			this.text = err
+			this.snackbar = true
+		})
+		socket.on('connect', (resp) => {
+			this.text = resp && resp.data ? socket.id + ' ' + resp.data : ''
+			this.snackbar = true
+			this.$store.commit('setWebSocket', socket)
+		})
+		socket.on('disconnect', () => {
+			this.text = 'Disconnected'
+			this.snackbar = true
+		})
+		socket.on('new_chat', (resp) => {
+			this.$store.commit('addChatHistory', { incoming: true, data: JSON.parse(resp) })
+			setTimeout(() => {
+				const chatView = document.getElementById('chatView')
+				chatView.scrollTop = chatView.scrollHeight
+			}, 50)
+		})
+		axios
+			.get('http://127.0.0.1:8080/allusers')
+			.then(function (response) {
+				_this.$store.commit('setUsersList', response.data)
 			})
-			socket.on('connect', (resp) => {
-				this.text = resp && resp.data ? socket.id + ' ' + resp.data : ''
-				this.snackbar = true
-				this.$store.commit('setWebSocket', socket)
+			.catch(function (error) {
+				console.log(error)
 			})
-			socket.on('disconnect', () => {
-				this.text = 'Disconnected'
-				this.snackbar = true
-			})
-			socket.on('new_chat', (resp) => {
-				this.$store.commit('addChatHistory', { incoming: true, data: JSON.parse(resp) })
-			})
-			axios
-				.get('http://127.0.0.1:8080/allusers')
-				.then(function (response) {
-					_this.$store.commit('setUsersList', response.data)
-				})
-				.catch(function (error) {
-					console.log(error)
-				})
-		},
-	}
+	},
+}
 </script>
 
 <style>
-	#app {
-		font-family: Avenir, Helvetica, Arial, sans-serif;
-		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale;
-		text-align: center;
-		color: #2c3e50;
-	}
+#app {
+	font-family: Avenir, Helvetica, Arial, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-align: center;
+	color: #2c3e50;
+}
 
-	nav {
-		padding: 30px;
-	}
+nav {
+	padding: 30px;
+}
 
-	nav a {
-		font-weight: bold;
-		color: #2c3e50;
-	}
+nav a {
+	font-weight: bold;
+	color: #2c3e50;
+}
 
-	nav a.router-link-exact-active {
-		color: #42b983;
-	}
+nav a.router-link-exact-active {
+	color: #42b983;
+}
 </style>
