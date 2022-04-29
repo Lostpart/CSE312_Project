@@ -23,6 +23,7 @@
 
 		methods: {
 			login() {
+				const _this = this
 				const loginJson = {}
 				loginJson['email'] = this.email
 				loginJson['password'] = this.password
@@ -32,12 +33,27 @@
 						if (response.data.status === 'Error') {
 							alert(response.data['message'])
 						} else {
-							this.$store.commit('setDisplayName', response.data["displayName"])
-							this.$store.commit('setEmail', response.data["email"])
-							this.$store.commit('setUserID', response.data["user_id"])
+							this.$store.commit('setDisplayName', response.data['displayName'])
+							this.$store.commit('setEmail', response.data['email'])
+							this.$store.commit('setUserID', response.data['user_id'])
 						}
 					})
 					.catch((error) => alert(error))
+				const usersList = this.$store.state.user.usersList
+				const userID = this.$store.state.user.userID
+				if (usersList && userID) {
+					for (let i = 0; i < usersList.length; i++) {
+						axios
+							.post('http://127.0.0.1:8080/chatHistory', { from: userID, to: usersList[i]['user_id'] })
+							.then(function (response) {
+								_this.$store.commit('setChatHistory', { user_id: usersList[i]['user_id'], history: response['data'] })
+							})
+							.catch(function (error) {
+								console.log(error)
+							})
+					}
+          console.log(this.$store.state.user.chatHistory)
+				}
 			},
 			reset() {
 				this.$refs.form.reset()

@@ -6,12 +6,12 @@
 				<v-list>
 					<v-list-item>
 						<v-list-item-avatar color="blue" size="60">
-							<span class="white--text text-h5">{{currentUserAvatarName}}</span>
+							<span class="white--text text-h5">{{ currentUserAvatarName }}</span>
 						</v-list-item-avatar>
 					</v-list-item>
 					<v-list-item link>
 						<v-list-item-content>
-							<v-list-item-title class="text-h6"> {{this.$store.state.user.displayName}} </v-list-item-title>
+							<v-list-item-title class="text-h6"> {{ this.$store.state.user.displayName }} </v-list-item-title>
 						</v-list-item-content>
 
 						<v-list-item-action>
@@ -56,8 +56,8 @@
 </template>
 
 <script>
-	// import DashBoard from './pages/DashBoard'
 	import { io } from 'socket.io-client'
+	import axios from 'axios'
 
 	export default {
 		name: 'App',
@@ -66,12 +66,12 @@
 			// CardsStack,
 			// DashBoard
 		},
-		computed:{
-			currentUserAvatarName(){
+		computed: {
+			currentUserAvatarName() {
 				const displayName = this.$store.state.user.displayName
-				if(displayName && displayName.length > 0) return displayName.substring(0, 1).toUpperCase() 
+				if (displayName && displayName.length > 0) return displayName.substring(0, 1).toUpperCase()
 				return ''
-			}
+			},
 		},
 		data: () => ({
 			snackbar: false,
@@ -92,6 +92,7 @@
 			},
 		},
 		mounted() {
+			const _this = this
 			const socket = io('http://127.0.0.1:8080', {
 				transports: ['websocket', 'polling'],
 			})
@@ -101,7 +102,7 @@
 				this.snackbar = true
 			})
 			socket.on('connect', (resp) => {
-				this.text = socket.id + ' ' + resp.data
+				this.text = resp && resp.data ? socket.id + ' ' + resp.data : ''
 				this.snackbar = true
 				this.$store.commit('setWebSocket', socket)
 			})
@@ -113,6 +114,14 @@
 				this.text = 'Disconnected'
 				this.snackbar = true
 			})
+			axios
+				.get('http://127.0.0.1:8080/allusers')
+				.then(function (response) {
+					_this.$store.commit('setUsersList', response.data)
+				})
+				.catch(function (error) {
+					console.log(error)
+				})
 		},
 	}
 </script>
