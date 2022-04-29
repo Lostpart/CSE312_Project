@@ -19,7 +19,7 @@ def index():
     return app.send_static_file("index.html")
 
 
-@app.route("/chatHistory")
+@app.route("/chatHistory", methods=["POST"])
 def chat_history():
     data = json.loads(request.get_data(as_text=True))
     receive = chat_db.chat_history(data, chat_collection)
@@ -62,11 +62,19 @@ def test_msg(rawdata):
 @socket_server.on('send_chat')
 def send_chat(rawdata):
     check, answer = chat_controller.controller(rawdata)
-    if check is False:
+    if not check:
         socket_server.emit('error', json.dumps(answer))
     else:
-        join_room(answer["to"])
-        socket_server.emit('new_chat', json.dumps(answer["response"]), room=json.dumps(answer["to"]))
+        join_room(rawdata["to"])
+        socket_server.emit('new_chat', json.dumps(answer["response"]['message']), room=rawdata["from"])
+    pass
+
+
+@socket_server.on('join')
+def on_join(data):
+    room = data['room']
+    join_room(room)
+    socket_server.send(data['displayName'] + ' has entered the room.', room=room)
     pass
 
 
