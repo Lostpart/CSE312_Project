@@ -110,9 +110,8 @@
 				this.text = 'Disconnected'
 				this.snackbar = true
 			})
-			socket.on('new_chat', () => {
-				this.text = 'Disconnected'
-				this.snackbar = true
+			socket.on('new_chat', (resp) => {
+				this.$store.commit('addChatHistory', { incoming: true, data: JSON.parse(resp) })
 			})
 			axios
 				.get('http://127.0.0.1:8080/allusers')

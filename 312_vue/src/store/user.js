@@ -47,11 +47,13 @@ export default {
 				if (state.chatHistory[chatObj['data']['from']] === undefined) {
 					state.chatHistory[chatObj['data']['from']] = []
 				}
+				chatObj['data']['flag'] = true
 				state.chatHistory[chatObj['data']['from']].push(chatObj['data'])
 			} else {
 				if (state.chatHistory[chatObj['data']['to']] === undefined) {
 					state.chatHistory[chatObj['data']['to']] = []
 				}
+				chatObj['data']['flag'] = false
 				state.chatHistory[chatObj['data']['to']].push(chatObj['data'])
 			}
 		},

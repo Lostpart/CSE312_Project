@@ -33,9 +33,13 @@
 						if (response.data.status === 'Error') {
 							alert(response.data['message'])
 						} else {
-							this.$store.commit('setDisplayName', response.data['displayName'])
-							this.$store.commit('setEmail', response.data['email'])
-							this.$store.commit('setUserID', response.data['user_id'])
+							_this.$store.commit('setDisplayName', response.data['displayName'])
+							_this.$store.commit('setEmail', response.data['email'])
+							_this.$store.commit('setUserID', response.data['user_id'])
+							this.$store.state.user.webSocket.emit('join', {
+								displayName: response.data['displayName'],
+								room: response.data['user_id'],
+							})
 						}
 					})
 					.catch((error) => alert(error))
@@ -46,13 +50,17 @@
 						axios
 							.post('http://127.0.0.1:8080/chatHistory', { from: userID, to: usersList[i]['user_id'] })
 							.then(function (response) {
-								_this.$store.commit('setChatHistory', { user_id: usersList[i]['user_id'], history: response['data'] })
+								const historyArr = response['data']
+								if (!historyArr) return
+								for (let i = 0; i < historyArr.length; i++) {
+									historyArr[i]['flag'] = historyArr[i]['from'] !== userID
+								}
+								_this.$store.commit('setChatHistory', { user_id: usersList[i]['user_id'], history: historyArr})
 							})
 							.catch(function (error) {
 								console.log(error)
 							})
 					}
-          console.log(this.$store.state.user.chatHistory)
 				}
 			},
 			reset() {
