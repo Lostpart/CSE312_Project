@@ -4,7 +4,7 @@ import sys
 from flask import Flask, request
 from flask_socketio import SocketIO, join_room, leave_room
 
-from controller.moment import moment_create_controller
+from controller.moment import moment_create_controller, moment_get_recent_moment_controller
 from dal import connect_database, chat_db
 from chat import chat_controller
 from dal.connect_database import connect_databases
@@ -42,6 +42,13 @@ def home_register():
 def moment_create():
     payload = request.data
     return moment_create_controller.create_controller(payload, image_collection, moment_collection)
+
+
+@app.route("/moment/getRecentMoments", methods=["POST"])
+def moment_create():
+    payload = request.data
+    return moment_get_recent_moment_controller.get_recent_moments_controller(payload, image_collection,
+                                                                             moment_collection)
 
 
 @socket_server.on('connect')
