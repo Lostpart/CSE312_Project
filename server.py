@@ -77,6 +77,7 @@ def send_moment(rawdata):
 
 
 # ------------------ test_route -------------------
+'''
 @app.route("/test-sendchat", methods=["POST"])
 def test_send_chat():
     data = json.loads(request.get_data(as_text=True))
@@ -106,7 +107,7 @@ def test_chat_controller():
         return json.dumps(b["response"])
     else:
         return json.dumps(b)
-
+'''
 
 if __name__ == '__main__':
     port = 8080
