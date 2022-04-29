@@ -3,6 +3,7 @@ import mongomock
 
 from manager.user_manager import *
 from dal.user_dal import *
+from test.test_utils import drop_table
 
 class UnitTesting(unittest.TestCase):
     def setUp(self):
@@ -83,6 +84,16 @@ class UnitTesting(unittest.TestCase):
         # Drop table at the end
         message = drop_table(self.database, "user")
         self.assertTrue(message)
+    
+    def drop_table(database, table: str):
+        if table in database.list_collection_names():
+            expect_table = database[table]
+            expect_table.drop()
+            # message = "Table " + table + "dropped"
+            return True
+        else:
+            error_message = "Table " + table + " doesn't exist"
+        return error_message
 
     # Corret part
     username1 = "howie"

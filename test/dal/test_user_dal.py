@@ -4,6 +4,7 @@ from bson import ObjectId
 import mongomock
 
 from dal.user_dal import *
+from test.test_utils import drop_table
 
 class UnitTesting(unittest.TestCase):
     def setUp(self):
