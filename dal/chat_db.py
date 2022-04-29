@@ -14,7 +14,7 @@ def send_chat(data, chat_collection, image_check):  # add chat
     if image_check:
         print("here")
         image_data = data["image"]
-        #image_id = image_manager.add_image_by_base64(from_user, image_data)
+        # image_id = image_manager.add_image_by_base64(from_user, image_data)
     chat_collection.insert_one(
         {"from": ObjectId(from_user), "to": ObjectId(to_user), "message": message, "image": image_id})
     print("finish")

@@ -4,7 +4,7 @@ import sys
 from flask import Flask, request
 from flask_socketio import SocketIO, join_room, leave_room
 
-from dal import connect_database, chat_db
+from dal import chat_db
 from chat import chat_controller
 from dal.connect_database import connect_databases
 from manager import user_manager
@@ -61,7 +61,7 @@ def test_msg(rawdata):
 
 @socket_server.on('send_chat')
 def send_chat(rawdata):
-    check, answer = chat_controller.controller(rawdata)
+    check, answer = chat_controller.controller(rawdata, chat_collection)
     if check is False:
         socket_server.emit('error', json.dumps(answer))
     else:

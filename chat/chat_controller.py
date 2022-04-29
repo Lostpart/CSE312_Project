@@ -1,11 +1,9 @@
 import json
-
-from flask_socketio import join_room
-
+from flask import escape
 from dal import connect_database, chat_db
 
 
-def controller(rawdata):
+def controller(rawdata, collection):
     # rawdata {"from": str, "to": str, "message": str, "image": null}
     check, note = check_data(rawdata)  # check chat format
     if not check:  # error message
@@ -13,9 +11,7 @@ def controller(rawdata):
         return False, error_msg
     else:
         data = json.loads(rawdata)
-        chat_collection = connect_database.connect_databases(["chat"])  # connect db
-        chat_collection = chat_collection["chat"]
-        chat_db.send_chat(data, chat_collection, note)  # store chat into db
+        chat_db.send_chat(data, collection, note)  # store chat into db
         to = data["to"]
         print("Client→Python：{}".format(data))
         msg = {}
