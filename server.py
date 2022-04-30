@@ -40,16 +40,18 @@ def home_register():
 
 
 @socket_server.on('connect')
-def test_connect():
+def test_connect(user_id):
     print('Client connected')
+    join_room(user_id)  # 创建自己的room
     socket_server.emit('connect', {'data': 'Connected'})
 
 
 @socket_server.on('disconnect')
-def test_disconnect():
+def test_disconnect(user_id):
     print('Client disconnected')
+    leave_room(user_id)  # 不存在多余的room，直接leave自己个人的room
 
-
+'''
 @socket_server.on('test_msg')
 def test_msg(rawdata):
     # rawdata = str(request.data)
@@ -57,7 +59,7 @@ def test_msg(rawdata):
     response = json.dumps({"msg_type": "test_msg", "msg": rawdata})
     socket_server.emit('test_msg', response)
     pass
-
+'''
 
 @socket_server.on('send_chat')
 def send_chat(rawdata):
@@ -65,8 +67,9 @@ def send_chat(rawdata):
     if check is False:
         socket_server.emit('error', json.dumps(answer))
     else:
-        join_room(answer["to"])
+        join_room(answer["to"])  # 发送前join_room, 发完直接leave_room
         socket_server.emit('new_chat', json.dumps(answer["response"]), room=json.dumps(answer["to"]))
+        leave_room(answer["to"])
     pass
 
 
