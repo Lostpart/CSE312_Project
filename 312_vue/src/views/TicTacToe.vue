@@ -1,5 +1,5 @@
 <template>
-	<div class="tictactoe" style="margin-top:200px">
+	<div class="tictactoe" style="margin-top: 200px">
 		<div class="row">
 			<CellGrid @click="onClickCellGrid(0, $event)" i="0" />
 			<CellGrid @click="onClickCellGrid(1, $event)" i="1" />
@@ -16,7 +16,10 @@
 			<CellGrid @click="onClickCellGrid(8, $event)" i="8" />
 		</div>
 		<div style="margin-top: 30px">
-			{{ result === null ? '' : `Result: ${result === 'draw' ? 'draw' : this.result + ' wins'}` }}
+			<v-btn elevation="2" v-show="finished">{{ 'Result: ' + (result === 'draw' ? 'draw' : result + ' wins') }}</v-btn>
+		</div>
+		<div>
+			<v-btn elevation="2" v-show="finished" style="margin-top: 20px" @click="resetMap">RESET</v-btn>
 		</div>
 	</div>
 </template>
@@ -55,18 +58,29 @@
 			},
 		},
 		methods: {
+			resetMap() {
+				this.$store.state.user.webSocket.emit('update_map', {
+					map: [
+						[null, null, null],
+						[null, null, null],
+						[null, null, null],
+					],
+					result: null,
+					finished: false,
+					n: 0,
+				})
+			},
 			onClickCellGrid(i) {
 				if (this.finished) return
 				const text = this.n % 2 === 0 ? 'x' : 'o'
 				this.$store.commit('setN', this.n + 1)
 				this.$store.commit('updateMap', { i: i, text: text })
 				this.checkWinner(i, text)
-				const socket = this.$store.state.user.webSocket
 				const map = this.$store.state.user.map
 				const result = this.$store.state.user.result
 				const finished = this.$store.state.user.finished
 				const n = this.$store.state.user.n
-				socket.emit('update_map', { map: map, result: result, finished: finished, n: n })
+				this.$store.state.user.webSocket.emit('update_map', { map: map, result: result, finished: finished, n: n })
 			},
 			checkWinner(i, text) {
 				const currRow = Math.floor(i / 3)
@@ -88,8 +102,7 @@
 				}
 			},
 		},
-		mounted() {
-		},
+		mounted() {},
 	}
 </script>
 
