@@ -7,17 +7,21 @@ export default {
 		chatHistory: {},
 		usersList: [],
 		webSocket: null,
-		map: [],
+		map: [
+			[null, null, null],
+			[null, null, null],
+			[null, null, null],
+		],
 		n: 0,
 		result: null,
-		finished:false
+		finished: false,
 	},
 	mutations: {
-		setMap(state,val) {
+		setMap(state, val) {
 			state.map = val
 		},
 		setN(state, val) {
-			state.n = val	
+			state.n = val
 		},
 		setResult(state, val) {
 			state.result = val

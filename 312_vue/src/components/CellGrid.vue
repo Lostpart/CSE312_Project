@@ -11,10 +11,14 @@
 		props: ['n', 'finished', 'i'],
 		data() {
 			return {
-				text: '',
 			}
 		},
 		computed: {
+			text() {
+				const row = Math.floor(this.i / 3)
+				const col = this.i % 3
+				return this.$store.state.user.map[row][col]
+			},
 		},
 		methods: {
 			onClickSelf() {
@@ -29,15 +33,6 @@
 			},
 		},
 		mounted() {
-			const row = Math.floor(this.i / 3)
-			const col = this.i % 3
-			setInterval(() => {
-				try {
-					this.text = this.$store.state.user.map[row][col]
-				} catch (err) {
-					// console.log(row, col)
-				}
-			}, 200)
 		},
 	}
 </script>
