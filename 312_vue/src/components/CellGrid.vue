@@ -1,31 +1,43 @@
 <template>
 	<div>
 		<div class="cell" v-on:click="onClickSelf">
-			<template v-if="a">{{ text }}</template>
-			<template v-else></template>
+			<template>{{ text }}</template>
 		</div>
 	</div>
 </template>
 
 <script>
 	export default {
-		props: ['n', 'finished'],
+		props: ['n', 'finished', 'i'],
 		data() {
-			return { a: false, text: '' }
+			return {
+				text: '',
+			}
 		},
-
+		computed: {
+		},
 		methods: {
 			onClickSelf() {
 				if (this.finished) {
 					return
 				}
-				if (this.text !== '') {
+				if (this.text && this.text !== '') {
 					return
 				}
 				this.a = true
-				this.text = this.n % 2 === 0 ? 'x' : 'o'
 				this.$emit('click', this.text)
 			},
+		},
+		mounted() {
+			const row = Math.floor(this.i / 3)
+			const col = this.i % 3
+			setInterval(() => {
+				try {
+					this.text = this.$store.state.user.map[row][col]
+				} catch (err) {
+					// console.log(row, col)
+				}
+			}, 200)
 		},
 	}
 </script>

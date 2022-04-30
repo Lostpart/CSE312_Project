@@ -42,7 +42,16 @@ def home_register():
 @socket_server.on('connect')
 def test_connect():
     print('Client connected')
+    global chessMap
     socket_server.emit('connect', {'data': 'Connected'})
+    socket_server.emit('update_map', str(json.dumps(chessMap)), broadcast=True)
+
+
+@socket_server.on('update_map')
+def update_map(new_map):
+    global chessMap
+    chessMap = new_map
+    socket_server.emit('update_map', str(json.dumps(chessMap)), broadcast=True)
 
 
 @socket_server.on('disconnect')
@@ -120,7 +129,8 @@ if __name__ == '__main__':
     port = 8080
     if len(sys.argv) >= 2:
         port = sys.argv[1]
-
+    chessMap = {'map': [[None, None, None], [None, None, None], [None, None, None]], 'result': None, 'finished': False,
+                'n': 0}
     collection_list = ["user", "chat", "image", "moment"]
     db_list = connect_databases(collection_list)
     user_collection = db_list["user"]

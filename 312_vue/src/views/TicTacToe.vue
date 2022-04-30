@@ -1,47 +1,72 @@
 <template>
-	<div class="tictactoe" >
-		<div class="chess" style="margin-top:100px">
-			<div class="row">
-				<CellGrid @click="onClickCellGrid(0, $event)" :n="n" :finished="finished" />
-				<CellGrid @click="onClickCellGrid(1, $event)" :n="n" :finished="finished" />
-				<CellGrid @click="onClickCellGrid(2, $event)" :n="n" :finished="finished" />
-			</div>
-			<div class="row">
-				<CellGrid @click="onClickCellGrid(3, $event)" :n="n" :finished="finished" />
-				<CellGrid @click="onClickCellGrid(4, $event)" :n="n" :finished="finished" />
-				<CellGrid @click="onClickCellGrid(5, $event)" :n="n" :finished="finished" />
-			</div>
-			<div class="row">
-				<CellGrid @click="onClickCellGrid(6, $event)" :n="n" :finished="finished" />
-				<CellGrid @click="onClickCellGrid(7, $event)" :n="n" :finished="finished" />
-				<CellGrid @click="onClickCellGrid(8, $event)" :n="n" :finished="finished" />
-			</div>
+	<div class="tictactoe" style="margin-top:200px">
+		<div class="row">
+			<CellGrid @click="onClickCellGrid(0, $event)" i="0" />
+			<CellGrid @click="onClickCellGrid(1, $event)" i="1" />
+			<CellGrid @click="onClickCellGrid(2, $event)" i="2" />
 		</div>
-		<div style="margin-top:30px">{{ result === null ? '' : `Result: ${result === 'draw' ? 'draw' : this.result + ' wins'}` }}</div>
+		<div class="row">
+			<CellGrid @click="onClickCellGrid(3, $event)" i="3" />
+			<CellGrid @click="onClickCellGrid(4, $event)" i="4" />
+			<CellGrid @click="onClickCellGrid(5, $event)" i="5" />
+		</div>
+		<div class="row">
+			<CellGrid @click="onClickCellGrid(6, $event)" i="6" />
+			<CellGrid @click="onClickCellGrid(7, $event)" i="7" />
+			<CellGrid @click="onClickCellGrid(8, $event)" i="8" />
+		</div>
+		<div style="margin-top: 30px">
+			{{ result === null ? '' : `Result: ${result === 'draw' ? 'draw' : this.result + ' wins'}` }}
+		</div>
 	</div>
 </template>
 
 <script>
 	import CellGrid from '@/components/CellGrid.vue'
 	export default {
-		components: { CellGrid },
+		components: {
+			CellGrid,
+		},
 		data() {
 			return {
-				n: 0,
-				map: [
-					[null, null, null],
-					[null, null, null],
-					[null, null, null],
-				],
-				result: null,
-				finished: false,
+				updated: true,
 			}
 		},
+		watch: {
+			map() {
+				this.updated = false
+				this.$nextTick(() => {
+					this.updated = true
+				})
+			},
+		},
+		computed: {
+			map() {
+				return this.$store.state.user.map
+			},
+			result() {
+				return this.$store.state.user.result
+			},
+			finished() {
+				return this.$store.state.user.finished
+			},
+			n() {
+				return this.$store.state.user.n
+			},
+		},
 		methods: {
-			onClickCellGrid(i, text) {
-				this.map[Math.floor(i / 3)][i % 3] = text
-				this.n += 1
+			onClickCellGrid(i) {
+				if (this.finished) return
+				const text = this.n % 2 === 0 ? 'x' : 'o'
+				this.$store.commit('setN', this.n + 1)
+				this.$store.commit('updateMap', { i: i, text: text })
 				this.checkWinner(i, text)
+				const socket = this.$store.state.user.webSocket
+				const map = this.$store.state.user.map
+				const result = this.$store.state.user.result
+				const finished = this.$store.state.user.finished
+				const n = this.$store.state.user.n
+				socket.emit('update_map', { map: map, result: result, finished: finished, n: n })
 			},
 			checkWinner(i, text) {
 				const currRow = Math.floor(i / 3)
@@ -53,15 +78,17 @@
 					(map[0][0] === text && map[1][1] === text && map[2][2] === text) ||
 					(map[2][0] === text && map[1][1] === text && map[0][2] === text)
 				) {
-					this.result = text
-					this.finished = true
+					this.$store.commit('setResult', text)
+					this.$store.commit('setFinished', true)
 					return
 				}
 				if (this.n === 9) {
-					this.result = 'draw'
-					this.finished = true
+					this.$store.commit('setResult', 'draw')
+					this.$store.commit('setFinished', true)
 				}
 			},
+		},
+		mounted() {
 		},
 	}
 </script>

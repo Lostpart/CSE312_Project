@@ -7,11 +7,31 @@ export default {
 		chatHistory: {},
 		usersList: [],
 		webSocket: null,
-		map:[]
+		map: [],
+		n: 0,
+		result: null,
+		finished:false
 	},
 	mutations: {
 		setMap(state,val) {
 			state.map = val
+		},
+		setN(state, val) {
+			state.n = val	
+		},
+		setResult(state, val) {
+			state.result = val
+		},
+		setFinished(state, val) {
+			state.finished = val
+		},
+		updateMap(state, updateObj) {
+			const i = updateObj['i']
+			const text = updateObj['text']
+			const row = Math.floor(i / 3)
+			const col = i % 3
+			state.map[row][col] = text
+			console.log(state.map)
 		},
 		setWebSocket(state, val) {
 			state.webSocket = val
