@@ -4,7 +4,8 @@ import sys
 from flask import Flask, request
 from flask_socketio import SocketIO, join_room, leave_room
 
-from dal import chat_db
+from controller.moment import moment_create_controller, moment_get_recent_moment_controller
+from dal import connect_database, chat_db
 from chat import chat_controller
 from dal.connect_database import connect_databases
 from manager import user_manager
@@ -19,7 +20,7 @@ def index():
     return app.send_static_file("index.html")
 
 
-@app.route("/chatHistory")
+@app.route("/chatHistory", methods=["POST"])
 def chat_history():
     data = json.loads(request.get_data(as_text=True))
     receive = chat_db.chat_history(data, chat_collection)
@@ -39,6 +40,19 @@ def home_register():
                                  user_collection)
 
 
+@app.route("/moment/create", methods=["POST"])
+def moment_create():
+    payload = request.data
+    return moment_create_controller.create_controller(payload, image_collection, moment_collection)
+
+
+@app.route("/moment/getRecentMoments", methods=["POST"])
+def moment_get_recent_moments():
+    payload = request.data
+    return moment_get_recent_moment_controller.get_recent_moments_controller(payload, image_collection,
+                                                                             moment_collection)
+
+
 @socket_server.on('connect')
 def test_connect(user_id):
     print('Client connected')
@@ -51,6 +65,20 @@ def test_disconnect(user_id):
     print('Client disconnected')
     leave_room(user_id)  # 不存在多余的room，直接leave自己个人的room
 
+
+@socket_server.on('moment_like')
+def moment_like(payload):
+    try:
+        result = moment_like.moment_like_controller(payload)
+    except ValueError as err:
+        data = {"status": "error", "message": err}
+        socket_server.send(json.dumps(data))
+        return
+
+    sending_json = json.dumps(result)
+    socket_server.emit(sending_json, broadcast=True)
+    return
+
 '''
 @socket_server.on('test_msg')
 def test_msg(rawdata):
@@ -58,7 +86,6 @@ def test_msg(rawdata):
     print("Client→Python：{}".format(rawdata))
     response = json.dumps({"msg_type": "test_msg", "msg": rawdata})
     socket_server.emit('test_msg', response)
-    pass
 '''
 
 @socket_server.on('send_chat')
@@ -70,6 +97,14 @@ def send_chat(rawdata):
         join_room(answer["to"])  # 发送前join_room, 发完直接leave_room
         socket_server.emit('new_chat', json.dumps(answer["response"]), room=json.dumps(answer["to"]))
         leave_room(answer["to"])
+    pass
+
+
+@socket_server.on('join')
+def on_join(data):
+    room = data['room']
+    join_room(room)
+    socket_server.send(data['displayName'] + ' has entered the room.', room=room)
     pass
 
 

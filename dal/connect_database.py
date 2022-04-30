@@ -21,6 +21,7 @@ def connect_databases(collection_list):
 
 def get_mongo_url():
     env_url = os.getenv('MONGODB_URL')
+    print("Getting env_url: {}".format(env_url))
     if env_url is None:
         return "mongo:27017"
     else:

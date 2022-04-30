@@ -3,62 +3,97 @@ import mongomock
 
 from manager.user_manager import *
 from dal.user_dal import *
+from test.test_utils import drop_table
 
 class UnitTesting(unittest.TestCase):
     def setUp(self):
         mongo_client = mongomock.MongoClient()
-        self.user_collection = mongo_client["CSE312"]["user"]
+        self.database = mongo_client["CSE312"]
+        self.user_collection = self.database["user"]
 
     def test_register(self):
         # Register a normal user
-        test_user = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2]))
+        test_user = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2], self.user_collection))
         self.assertTrue("user_id" in test_user.keys())
         test_id = test_user["user_id"]
         self.assertEqual(test_user, {"displayName": "howie", "user_id": test_id, "email": "howie@gmail.com"})
 
         # Register a repeated user
-        test_user = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2]))
+        test_user = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2], self.user_collection))
         self.assertEqual(test_user, {'status': 'Error', 'message': 'A account with this email already exist.'})
 
         # Register a user with wrong email
-        test_user = json.loads(register(self.user[4][0], self.user[4][1], self.user[4][2]))
+        test_user = json.loads(register(self.user[4][0], self.user[4][1], self.user[4][2], self.user_collection))
         self.assertEqual(test_user, {'status': 'Error', 'message': 'The email formmat is wrong.'})
 
         # Register a user with empty password
-        test_user = json.loads(register(self.user[5][0], self.user[5][1], self.user[5][2]))
+        test_user = json.loads(register(self.user[5][0], self.user[5][1], self.user[5][2], self.user_collection))
         self.assertEqual(test_user, {'status': 'Error', 'message': "password can't be empty"})
-        message = drop_table("user")
+
+        message = drop_table(self.database, "user")
         self.assertTrue(message)
 
     def test_login(self):
         # Login as a non-exits user
-        test_user = json.loads(login(self.user[6][1], self.user[6][2]))
+        
+        test_user = json.loads(login(self.user[6][1], self.user[6][2], self.user_collection))
         self.assertEqual(test_user, {'status': 'Error', 'message': 'User not found'})
 
-        test_user = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2]))
+        test_user = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2], self.user_collection))
         # Login as a exited user with all correct infor
-        test_user = json.loads(login(self.user[0][1], self.user[0][2]))
+        test_user = json.loads(login(self.user[0][1], self.user[0][2], self.user_collection))
         test_id = test_user["user_id"]
         self.assertEqual(test_user, {"displayName": "howie", "user_id": test_id, "email": "howie@gmail.com"})
 
         # Login as a exited user with wrong password
-        test_user = json.loads(login(self.user[3][1], self.user[3][2]))
+        test_user = json.loads(login(self.user[3][1], self.user[3][2], self.user_collection))
         self.assertEqual(test_user, {'status': 'Error', 'message': 'User not found'})
 
         # Login as a exited user with wrong email
-        test_user = json.loads(login(self.user[4][1], self.user[4][2]))
+        test_user = json.loads(login(self.user[4][1], self.user[4][2], self.user_collection))
         self.assertEqual(test_user, {'status': 'Error', 'message': 'User not found'})
 
         # Login as a exited user with empty password
-        test_user = json.loads(login(self.user[5][1], self.user[5][2]))
+        test_user = json.loads(login(self.user[5][1], self.user[5][2], self.user_collection))
         self.assertEqual(test_user, {'status': 'Error', 'message': 'User not found'})
 
         # Login as a exited user with no email
-        test_user = json.loads(login("", self.user[6][2]))
+        test_user = json.loads(login("", self.user[6][2], self.user_collection))
         self.assertEqual(test_user, {'status': 'Error', 'message': 'User not found'})
 
-        message = drop_table("user")
+        message = drop_table(self.database, "user")
         self.assertTrue(message)
+
+    def test_get_all(self):
+        # Test when there is no user in database
+        user_list = json.loads(get_all_user(self.user_collection))
+        self.assertEqual(user_list, {})
+
+        # Test when there is one user
+        test_user1 = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2], self.user_collection))
+        test_id1 = test_user1["user_id"]
+        user_list = json.loads(get_all_user(self.user_collection))
+        self.assertEqual(user_list, {test_id1: {"displayName": "howie", "email": "howie@gmail.com"}})
+
+        # Test when there are more than one user, which are two users
+        test_user2 = json.loads(register(self.user[1][0], self.user[1][1], self.user[1][2], self.user_collection))
+        test_id2 = test_user2["user_id"]
+        user_list = json.loads(get_all_user(self.user_collection))
+        self.assertEqual(user_list, {test_id1: {'displayName': 'howie', 'email': 'howie@gmail.com'}, test_id2: {'displayName': 'shouyue', 'email': 'shoouyue@email.com'}})
+
+        # Drop table at the end
+        message = drop_table(self.database, "user")
+        self.assertTrue(message)
+    
+    def drop_table(database, table: str):
+        if table in database.list_collection_names():
+            expect_table = database[table]
+            expect_table.drop()
+            # message = "Table " + table + "dropped"
+            return True
+        else:
+            error_message = "Table " + table + " doesn't exist"
+        return error_message
 
     # Corret part
     username1 = "howie"

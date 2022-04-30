@@ -133,3 +133,4 @@ dmypy.json
 /static/
 /.idea/
 /mongodb-data
+launch.json

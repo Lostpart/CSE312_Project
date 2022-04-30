@@ -4,42 +4,44 @@ from bson import ObjectId
 import mongomock
 
 from dal.user_dal import *
+from test.test_utils import drop_table
 
 class UnitTesting(unittest.TestCase):
     def setUp(self):
         mongo_client = mongomock.MongoClient()
-        self.user_collection = mongo_client["CSE312"]["user"]
+        self.database = mongo_client["CSE312"]
+        self.user_collection = self.database["user"]
 
     def test_create(self):
         # Test create a user with proper format
         # Inputs for create must be checked before passing arguments
-        test_result = create(self.user[0][0], self.user[0][1], self.user[0][2])
+        test_result = create(self.user_collection, self.user[0][0], self.user[0][1], self.user[0][2])
         self.assertEqual(test_result["displayName"], self.user[0][0])
         self.assertEqual(test_result["email"], self.user[0][1])
         self.assertTrue("user_id" in test_result.keys())
         self.assertTrue(test_result["user_id"] != "")
-        message = drop_table("user")
+        message = drop_table(self.database, "user")
         self.assertTrue(message)
 
     def test_get_user(self):
         # Get a non-exist user by id
-        test_result = get_user(ObjectId("4FAFEE7F4430C0696529710E"))
+        test_result = get_user(self.user_collection, ObjectId("4FAFEE7F4430C0696529710E"))
         self.assertEqual(test_result, {'status': False, 'message': 'User not found'})
 
         # Get a non-exist user by email and password
-        test_result = get_user(self.user[0][1], self.user[0][2])
+        test_result = get_user(self.user_collection, self.user[0][1], self.user[0][2])
         self.assertEqual(test_result, {'status': False, 'message': 'User not found'})
 
         # Get a existed user by id
-        temp_user = create(self.user[0][0], self.user[0][1], self.user[0][2])
+        temp_user = create(self.user_collection, self.user[0][0], self.user[0][1], self.user[0][2])
         test_id = ObjectId(temp_user["user_id"])
-        test_result = get_user(test_id)
+        test_result = get_user(self.user_collection, test_id)
         self.assertEqual(test_result, {'status': True, 'message': {'displayName': 'howie', 'email': 'howie@gmail.com', 'user_id': temp_user["user_id"]}})
         
         # Get a existed user by email and password
-        test_result = get_user(None, self.user[0][1], self.user[0][2])
+        test_result = get_user(self.user_collection, None, self.user[0][1], self.user[0][2])
         self.assertEqual(test_result, {'status': True, 'message': {'displayName': 'howie', 'email': 'howie@gmail.com', 'user_id': temp_user["user_id"]}})
-        message = drop_table("user")
+        message = drop_table(self.database, "user")
         self.assertTrue(message)
 
     def test_update(self):
