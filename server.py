@@ -45,7 +45,7 @@ def moment_create():
 
 
 @app.route("/moment/getRecentMoments", methods=["POST"])
-def moment_create():
+def moment_get_recent_moments():
     payload = request.data
     return moment_get_recent_moment_controller.get_recent_moments_controller(payload, image_collection,
                                                                              moment_collection)
