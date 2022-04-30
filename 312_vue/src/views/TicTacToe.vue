@@ -21,6 +21,9 @@
 		<div>
 			<v-btn elevation="2" v-show="finished" style="margin-top: 20px" @click="resetMap">RESET</v-btn>
 		</div>
+		<div>
+			<v-btn elevation="2" v-show="!finished" style="margin-top: 20px" @click="resetMap">NEXT:{{ nextPlayer }}</v-btn>
+		</div>
 	</div>
 </template>
 
@@ -44,6 +47,9 @@
 			},
 		},
 		computed: {
+			nextPlayer() {
+				return this.$store.state.user.n % 2 == 0 ? 'x' : 'o'
+			},
 			map() {
 				return this.$store.state.user.map
 			},
