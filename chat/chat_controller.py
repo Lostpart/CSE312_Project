@@ -11,13 +11,10 @@ def controller(rawdata, collection):
         return False, error_msg
     else:
         data = json.loads(rawdata)
+        data["message"] = html_escape(data["message"])
         chat_db.send_chat(data, collection, note)  # store chat into db
         to = data["to"]
         print("Client→Python：{}".format(data))
-        msg = {}
-        msg["from"] = data["from"]
-        msg["to"] = data["to"]
-        msg["message"] = data["message"]
         response = {"status": True, "message": data}  # send new chat
         # close db connection
         return True, {"to": to, "response": response}
@@ -27,23 +24,23 @@ def check_data(rawdata):  # revise check json, check "from", "to", "message", "i
     image_check = True
     try:
         data = json.loads(rawdata)
-    except:
+    except TypeError:
         return False, "rawdata is not json format"
     try:
         from_user = data["from"]
-    except:
+    except KeyError:
         return False, "'from' is not exists"
     try:
         to = data["to"]
-    except:
+    except KeyError:
         return False, "'to' is not exists"
     try:
         chat = data["message"]
-    except:
+    except KeyError:
         return False, "'message' is not exists"
     try:
         image = data["image"]
-    except:
+    except KeyError:
         image_check = False
 
     if not isinstance(from_user, str):
@@ -60,3 +57,12 @@ def check_data(rawdata):  # revise check json, check "from", "to", "message", "i
     if len(to) != 24:
         return False, "to is not consistent with ObjectId format"
     return True, image_check
+
+
+def html_escape(msg):
+    msg = msg.replace("&", "&amp;")
+    msg = msg.replace("<", "&lt;")
+    msg = msg.replace(">", "&gt;")
+    msg = msg.replace('"', "&quot;")
+    msg = msg.replace("'", "&apos;")
+    return msg

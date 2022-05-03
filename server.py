@@ -108,12 +108,6 @@ def on_join(data):
     pass
 
 
-@socket_server.on('test_moment')
-def send_moment(rawdata):
-    # call moment function
-    socket_server.emit('test_moment', rawdata, broadcast=True)
-
-
 # ------------------ test_route -------------------
 '''
 @app.route("/test-sendchat", methods=["POST"])
