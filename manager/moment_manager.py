@@ -37,7 +37,7 @@ def get_recent_moments(image_collection, moment_collection, limit=10):
                             "from": str(i["from"]),
                             "time": int(i["_id"].generation_time.timestamp()),
                             "content": i["content"],
-                            "image": [get_image_filename(j, image_collection) for j in (i.get("image", []))],
+                            "image": [get_image_filename(j, image_collection) for j in (i.get("image_list", []))],
                             "like": int(i["like"])})
 
     return moment_list
