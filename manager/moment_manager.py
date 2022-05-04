@@ -15,7 +15,7 @@ def create_moment(user_id_str, content, images, image_collection, moment_collect
         image_type = image_name[image_name.rfind(".") + 1:]
         if image_type not in accept_image_types:
             print("Unsupported image type when processing {}".format(image_name))
-            return {"status": "error", "message": "Image type not supported"}
+            raise TypeError("Image type not supported")
         image_list.append(add_image_by_base64(user_id, image_data_base64, image_type, image_collection))
 
     content = safe_html(content)
@@ -43,5 +43,7 @@ def get_recent_moments(image_collection, moment_collection, limit=10):
 
 def like_moment(moment_id, moment_collection):
     db_result = moment_dal.like_moment(ObjectId(moment_id), moment_collection)
+    if db_result is None:
+        raise LookupError("Can't find given moment")
     return db_result
 
