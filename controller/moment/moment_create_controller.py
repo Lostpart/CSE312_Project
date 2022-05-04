@@ -30,7 +30,7 @@ def create_controller(payload, image_collection, moment_collection):
     except TypeError as err:
         return on_fail(err)
 
-    return on_success(result), 200
+    return on_success(result)
 
 
 def on_success(data):
