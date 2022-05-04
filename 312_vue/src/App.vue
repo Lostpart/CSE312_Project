@@ -1,6 +1,13 @@
 <template>
 	<v-app>
 		<!-- <v-navigation-drawer app width="400"> -->
+		<DMNotification
+			style="position: absolute; top: 30px; right: 20px; z-index: 10"
+			:DmSender="DmSender"
+			:DmUserID="DmUserID"
+			:DmMsg="DmMsg"
+			v-show="DmDisplaying"
+		></DMNotification>
 		<v-navigation-drawer width="220" v-model="drawer" class="pa-0" app>
 			<v-sheet color="blue lighten-4" class="pa-0">
 				<v-list>
@@ -60,13 +67,12 @@
 <script>
 	import { io } from 'socket.io-client'
 	import axios from 'axios'
+	import DMNotification from '@/components/DMNotification.vue'
 
 	export default {
 		name: 'App',
 		components: {
-			// HelloWorld,
-			// CardsStack,
-			// DashBoard
+			DMNotification,
 		},
 		computed: {
 			currentUserAvatarName() {
@@ -76,6 +82,10 @@
 			},
 		},
 		data: () => ({
+			DmSender: '',
+			DmMsg: '',
+			DmDisplaying: false,
+			DmUserID: '',
 			snackbar: false,
 			text: '',
 			drawer: null,
@@ -92,6 +102,14 @@
 			reserve() {
 				this.loading = true
 				setTimeout(() => (this.loading = false), 2000)
+			},
+			getUsernameById(userID) {
+				const usersList = this.$store.state.user.usersList
+				console.log(usersList)
+				for (let i = 0; i < usersList.length; i++) {
+					if (usersList[i]['user_id'] === userID) return usersList[i]['displayName']
+				}
+				return ''
 			},
 		},
 		mounted() {
@@ -114,11 +132,17 @@
 				this.snackbar = true
 			})
 			socket.on('new_chat', (resp) => {
-				this.$store.commit('addChatHistory', { incoming: true, data: JSON.parse(resp) })
+				const newChatObj = JSON.parse(resp)
+				if (newChatObj['from'] === this.$store.state.user.userID) return
+				this.$store.commit('addChatHistory', { incoming: true, data: newChatObj })
 				setTimeout(() => {
 					const chatView = document.getElementById('chatView')
-					chatView.scrollTop = chatView.scrollHeight
+					if(chatView) chatView.scrollTop = chatView.scrollHeight
 				}, 50)
+				this.DmUserID = newChatObj['from']
+				this.DmSender = this.getUsernameById(newChatObj['from'])
+				this.DmMsg = newChatObj['message']
+				this.DmDisplaying = true
 			})
 			socket.on('update_map', (resp) => {
 				const mapObj = JSON.parse(resp)
