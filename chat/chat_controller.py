@@ -1,5 +1,4 @@
 import json
-from flask import escape
 from dal import connect_database, chat_db
 
 
