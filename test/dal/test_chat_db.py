@@ -1,16 +1,16 @@
 import json
 import unittest
-import requests
-from bson import ObjectId
-from dal.connect_database import connect_databases
+
+import mongomock
+
 from dal.chat_db import send_chat, chat_history
 
 
 class MyTestCase(unittest.TestCase):
 
     def test_something(self):
-        collection = connect_databases(["test-chat"])
-        collection = collection["test-chat"]
+        collection = mongomock.MongoClient()["test-chat_db"]
+        collection = collection["test-chat_db"]
         collection.delete_many({})
         dict1 = {
             "from": "123456789012123456789012",
@@ -24,7 +24,8 @@ class MyTestCase(unittest.TestCase):
         }
         a = chat_history(dict2, collection)
         a = json.loads(a)
-        self.assertEqual(a, [{'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'leile', 'image': None}])  # add assertion here
+        self.assertEqual(a, [{'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'leile',
+                              'image': None}])  # add assertion here
         collection.delete_many({})
         dict3 = {
             "from": "123456789012123456789012",
@@ -60,7 +61,13 @@ class MyTestCase(unittest.TestCase):
         a = chat_history(dict7, collection)
         a = json.loads(a)
         print(a)
-        self.assertEqual(a, [{'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'leile', 'image': None}, {'from': '123456789012123456789013', 'to': '123456789012123456789012', 'message': 'sheibushine', 'image': None}, {'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'xiangshuijiao', 'image': None}, {'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'woye', 'image': None}])  # add assertion here
+        self.assertEqual(a, [
+            {'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'leile', 'image': None},
+            {'from': '123456789012123456789013', 'to': '123456789012123456789012', 'message': 'sheibushine',
+             'image': None},
+            {'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'xiangshuijiao',
+             'image': None}, {'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'woye',
+                              'image': None}])  # add assertion here
         collection.delete_many({})
         dict3 = {
             "from": "123456789012123456789012",
@@ -118,6 +125,7 @@ class MyTestCase(unittest.TestCase):
              'image': None}, {'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'woye',
                               'image': None}])  # add assertion here
         collection.delete_many({})
+
 
 if __name__ == '__main__':
     unittest.main()

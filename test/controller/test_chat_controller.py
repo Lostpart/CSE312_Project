@@ -1,15 +1,17 @@
 import json
 import unittest
-import requests
-from chat import chat_controller
+
+import mongomock
+
+from controller import chat_controller
 from dal.connect_database import connect_databases
 
 
 class MyTestCase(unittest.TestCase):
 
     def test_something(self):
-        collection = connect_databases(["test-chat"])
-        collection = collection["test-chat"]
+        collection = mongomock.MongoClient()["test-chat_controller"]
+        collection = collection["test-chat_controller"]
         collection.delete_many({})
         dict1 = {"from": "123456789012123456789012", "to": "123456789012123456789013", "message": "leile"}
         a, b = chat_controller.controller(dict1, collection)
@@ -34,7 +36,8 @@ class MyTestCase(unittest.TestCase):
         }
         a, b = chat_controller.controller(json.dumps(dict4), collection)
         print(b)
-        self.assertEqual(b["response"], {'message': {'from': '123456789012123456789012', 'message': 'leile', 'to': '123456789012123456789013'},
+        self.assertEqual(b["response"], {
+            'message': {'from': '123456789012123456789012', 'message': 'leile', 'to': '123456789012123456789013'},
             'status': True})
 
 

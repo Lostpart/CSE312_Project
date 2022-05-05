@@ -1,6 +1,13 @@
 <template>
 	<v-app>
 		<!-- <v-navigation-drawer app width="400"> -->
+		<DMNotification
+			style="position: absolute; top: 30px; right: 20px; z-index: 10"
+			:DmSender="DmSender"
+			:DmUserID="DmUserID"
+			:DmMsg="DmMsg"
+			v-show="DmDisplaying"
+		></DMNotification>
 		<v-navigation-drawer width="220" v-model="drawer" class="pa-0" app>
 			<v-sheet color="blue lighten-4" class="pa-0">
 				<v-list>
@@ -49,9 +56,7 @@
 					{{ text }}
 
 					<template v-slot:action="{ attrs }">
-						<v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
-							Close
-						</v-btn>
+						<v-btn color="pink" text v-bind="attrs" @click="snackbar = false"> Close </v-btn>
 					</template>
 				</v-snackbar>
 			</div>
@@ -60,99 +65,123 @@
 </template>
 
 <script>
-import { io } from 'socket.io-client'
-import axios from 'axios'
+	import { io } from 'socket.io-client'
+	import axios from 'axios'
+	import DMNotification from '@/components/DMNotification.vue'
 
-export default {
-	name: 'App',
-	components: {
-		// HelloWorld,
-		// CardsStack,
-		// DashBoard
-	},
-	computed: {
-		currentUserAvatarName() {
-			const displayName = this.$store.state.user.displayName
-			if (displayName && displayName.length > 0)
-				return displayName.substring(0, 1).toUpperCase()
-			return ''
+	export default {
+		name: 'App',
+		components: {
+			DMNotification,
 		},
-	},
-	data: () => ({
-		snackbar: false,
-		text: '',
-		drawer: null,
-		links: [
-			['mdi-message-text', 'Messages', '/messages'],
-			['mdi-account-multiple', 'Square', '/square'],
-			['mdi-account-plus', 'Register', '/register'],
-			['mdi-account', 'Log In', '/login'],
-			['mdi-electron-framework', 'Moments', '/moments'],
-		],
-	}),
-	methods: {
-		reserve() {
-			this.loading = true
-			setTimeout(() => (this.loading = false), 2000)
+		computed: {
+			currentUserAvatarName() {
+				const displayName = this.$store.state.user.displayName
+				if (displayName && displayName.length > 0) return displayName.substring(0, 1).toUpperCase()
+				return ''
+			},
 		},
-	},
-	mounted() {
-		const _this = this
-		const socket = io('http://127.0.0.1:8080', {
-			transports: ['websocket', 'polling'],
-		})
+		data: () => ({
+			DmSender: '',
+			DmMsg: '',
+			DmDisplaying: false,
+			DmUserID: '',
+			snackbar: false,
+			text: '',
+			drawer: null,
+			links: [
+				['mdi-message-text', 'Messages', '/messages'],
+				['mdi-account-multiple', 'Square', '/square'],
+				['mdi-account-plus', 'Register', '/register'],
+				['mdi-account', 'Log In', '/login'],
+				['mdi-electron-framework', 'Moments', '/moments'],
+				['mdi-minus', 'Game', '/tictactoe'],
+			],
+		}),
+		methods: {
+			reserve() {
+				this.loading = true
+				setTimeout(() => (this.loading = false), 2000)
+			},
+			getUsernameById(userID) {
+				const usersList = this.$store.state.user.usersList
+				console.log(usersList)
+				for (let i = 0; i < usersList.length; i++) {
+					if (usersList[i]['user_id'] === userID) return usersList[i]['displayName']
+				}
+				return ''
+			},
+		},
+		mounted() {
+			const _this = this
+			const socket = io('http://127.0.0.1:8080', {
+				transports: ['websocket', 'polling'],
+			})
 
-		socket.on('connect_error', (err) => {
-			this.text = err
-			this.snackbar = true
-		})
-		socket.on('connect', (resp) => {
-			this.text = resp && resp.data ? socket.id + ' ' + resp.data : ''
-			this.snackbar = true
-			this.$store.commit('setWebSocket', socket)
-		})
-		socket.on('disconnect', () => {
-			this.text = 'Disconnected'
-			this.snackbar = true
-		})
-		socket.on('new_chat', (resp) => {
-			this.$store.commit('addChatHistory', { incoming: true, data: JSON.parse(resp) })
-			setTimeout(() => {
-				const chatView = document.getElementById('chatView')
-				chatView.scrollTop = chatView.scrollHeight
-			}, 50)
-		})
-		axios
-			.get('http://127.0.0.1:8080/allusers')
-			.then(function (response) {
-				_this.$store.commit('setUsersList', response.data)
+			socket.on('connect_error', (err) => {
+				this.text = err
+				this.snackbar = true
 			})
-			.catch(function (error) {
-				console.log(error)
+			socket.on('connect', (resp) => {
+				this.text = resp && resp.data ? socket.id + ' ' + resp.data : ''
+				this.snackbar = true
+				this.$store.commit('setWebSocket', socket)
 			})
-	},
-}
+			socket.on('disconnect', () => {
+				this.text = 'Disconnected'
+				this.snackbar = true
+			})
+			socket.on('new_chat', (resp) => {
+				const newChatObj = JSON.parse(resp)
+				if (newChatObj['from'] === this.$store.state.user.userID) return
+				this.$store.commit('addChatHistory', { incoming: true, data: newChatObj })
+				setTimeout(() => {
+					const chatView = document.getElementById('chatView')
+					if(chatView) chatView.scrollTop = chatView.scrollHeight
+				}, 50)
+				this.DmUserID = newChatObj['from']
+				this.DmSender = this.getUsernameById(newChatObj['from'])
+				this.DmMsg = newChatObj['message']
+				this.DmDisplaying = true
+			})
+			socket.on('update_map', (resp) => {
+				const mapObj = JSON.parse(resp)
+				this.$store.commit('setMap', mapObj['map'])
+				this.$store.commit('setResult', mapObj['result'])
+				this.$store.commit('setFinished', mapObj['finished'])
+				this.$store.commit('setN', mapObj['n'])
+			})
+			axios
+				.get('http://127.0.0.1:8080/allusers')
+				.then(function (response) {
+					_this.$store.commit('setUsersList', response.data)
+				})
+				.catch(function (error) {
+					console.log(error)
+				})
+		},
+	}
 </script>
 
 <style>
-#app {
-	font-family: Avenir, Helvetica, Arial, sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	text-align: center;
-	color: #2c3e50;
-}
+	#app {
+		font-family: Avenir, Helvetica, Arial, sans-serif;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		text-align: center;
+		color: #2c3e50;
+	}
 
-nav {
-	padding: 30px;
-}
+	nav {
+		padding: 30px;
+	}
 
-nav a {
-	font-weight: bold;
-	color: #2c3e50;
-}
+	nav a {
+		font-weight: bold;
+		color: #2c3e50;
+	}
 
-nav a.router-link-exact-active {
-	color: #42b983;
-}
+	nav a.router-link-exact-active {
+		color: #42b983;
+	}
 </style>

@@ -9,8 +9,7 @@ def controller(rawdata, collection):
         error_msg = {"status": "error", "message": note}
         return False, error_msg
     else:
-        data = json.loads(rawdata)
-        data["message"] = html_escape(data["message"])
+        data = rawdata
         chat_db.send_chat(data, collection, note)  # store chat into db
         to = data["to"]
         print("Client→Python：{}".format(data))
@@ -21,10 +20,13 @@ def controller(rawdata, collection):
 
 def check_data(rawdata):  # revise check json, check "from", "to", "message", "image" exists
     image_check = True
-    try:
-        data = json.loads(rawdata)
-    except TypeError:
-        return False, "rawdata is not json format"
+    if type(rawdata) is not dict:
+        try:
+            data = json.loads(rawdata)
+        except:
+            return False, "rawdata is not json format"
+    else:
+        data = rawdata
     try:
         from_user = data["from"]
     except KeyError:

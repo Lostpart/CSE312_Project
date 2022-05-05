@@ -5,8 +5,8 @@ from flask import Flask, request
 from flask_socketio import SocketIO, join_room, leave_room
 
 from controller.moment import moment_create_controller, moment_get_recent_moment_controller
-from dal import connect_database, chat_db
-from chat import chat_controller
+from dal import chat_db
+from controller import chat_controller
 from dal.connect_database import connect_databases
 from manager import user_manager
 
@@ -56,8 +56,17 @@ def moment_get_recent_moments():
 @socket_server.on('connect')
 def test_connect(user_id):
     print('Client connected')
+    global chessMap
     join_room(user_id)  # 创建自己的room
     socket_server.emit('connect', {'data': 'Connected'})
+    socket_server.emit('update_map', str(json.dumps(chessMap)), broadcast=True)
+
+
+@socket_server.on('update_map')
+def update_map(new_map):
+    global chessMap
+    chessMap = new_map
+    socket_server.emit('update_map', str(json.dumps(chessMap)), broadcast=True)
 
 
 @socket_server.on('disconnect')
@@ -94,9 +103,9 @@ def send_chat(rawdata):
     if check is False:
         socket_server.emit('error', json.dumps(answer))
     else:
-        join_room(answer["to"])  # 发送前join_room, 发完直接leave_room
-        socket_server.emit('new_chat', json.dumps(answer["response"]), room=json.dumps(answer["to"]))
-        leave_room(answer["to"])
+        join_room(rawdata["to"])  # 发送前join_room, 发完直接leave_room
+        socket_server.emit('new_chat', json.dumps(answer["response"]['message']), room=rawdata["to"])
+        leave_room(rawdata["to"])
     pass
 
 
@@ -145,7 +154,8 @@ if __name__ == '__main__':
     port = 8080
     if len(sys.argv) >= 2:
         port = sys.argv[1]
-
+    chessMap = {'map': [[None, None, None], [None, None, None], [None, None, None]], 'result': None, 'finished': False,
+                'n': 0}
     collection_list = ["user", "chat", "image", "moment"]
     db_list = connect_databases(collection_list)
     user_collection = db_list["user"]

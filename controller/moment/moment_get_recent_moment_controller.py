@@ -7,13 +7,12 @@ def get_recent_moments_controller(payload, image_collection, moment_collection):
     if payload is None:
         return on_fail("Invalid input: No payload")
 
-    limit = 100
-
     try:
         data = json.loads(payload)
     except json.decoder.JSONDecodeError:
         return on_fail("Invalid input: Not a JSON string")
 
+    limit = 100
     if "limit" in data:
         limit = data["limit"]
 
