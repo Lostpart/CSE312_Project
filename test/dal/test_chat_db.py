@@ -9,7 +9,6 @@ from dal.chat_db import send_chat, chat_history
 class MyTestCase(unittest.TestCase):
 
     def test_something(self):
-        return
         collection = mongomock.MongoClient()["test-chat_db"]
         collection = collection["test-chat_db"]
         collection.delete_many({})

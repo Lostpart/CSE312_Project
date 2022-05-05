@@ -33,7 +33,7 @@ jobs:
           DISCORD_USERNAME: "GitHub Python Unittest"
         uses: Ilshidur/action-discord@master
         with:
-          args: 'All tests pass'
+          args: ':smiley: All tests pass'
         if: always() && (steps.python_unittest.outcome != 'failure')
 
       - name: Discord notification (on fail)
@@ -42,5 +42,5 @@ jobs:
           DISCORD_USERNAME: "GitHub Python Unittest"
         uses: Ilshidur/action-discord@master
         with:
-          args: 'Some tests fail, please check {{GITHUB_SERVER_URL}}/{{ GITHUB_REPOSITORY }}/actions/runs/{{ GITHUB_RUN_ID }}'
+          args: ':weary: Some tests fail, the most recent push to main may brake something, please check {{GITHUB_SERVER_URL}}/{{ GITHUB_REPOSITORY }}/actions/runs/{{ GITHUB_RUN_ID }}'
         if: always() && (steps.python_unittest.outcome == 'failure')

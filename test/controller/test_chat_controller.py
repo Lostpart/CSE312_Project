@@ -10,7 +10,6 @@ from dal.connect_database import connect_databases
 class MyTestCase(unittest.TestCase):
 
     def test_something(self):
-        return
         collection = mongomock.MongoClient()["test-chat_controller"]
         collection = collection["test-chat_controller"]
         collection.delete_many({})
