@@ -2,7 +2,7 @@ import json
 import sys
 
 from flask import Flask, request
-from flask_socketio import SocketIO, join_room, leave_room
+from flask_socketio import SocketIO, join_room, leave_room, rooms
 
 from controller.moment import moment_create_controller, moment_get_recent_moment_controller
 from dal import connect_database, chat_db
@@ -56,23 +56,23 @@ def moment_get_recent_moments():
 @socket_server.on('connect')
 def test_connect(user_id):
     print('Client connected')
-    global chessMap
+    global chess_map
     join_room(user_id)  # 创建自己的room
     socket_server.emit('connect', {'data': 'Connected'})
-    socket_server.emit('update_map', str(json.dumps(chessMap)), broadcast=True)
+    socket_server.emit('update_map', str(json.dumps(chess_map)), broadcast=True)
 
 
 @socket_server.on('update_map')
 def update_map(new_map):
-    global chessMap
-    chessMap = new_map
-    socket_server.emit('update_map', str(json.dumps(chessMap)), broadcast=True)
+    global chess_map
+    chess_map = new_map
+    socket_server.emit('update_map', str(json.dumps(chess_map)), broadcast=True)
 
 
 @socket_server.on('disconnect')
-def test_disconnect(user_id):
+def test_disconnect():
     print('Client disconnected')
-    leave_room(user_id)  # 不存在多余的room，直接leave自己个人的room
+    # leave_room(user_id)  # 不存在多余的room，直接leave自己个人的room
 
 
 @socket_server.on('moment_like')
@@ -88,6 +88,7 @@ def moment_like(payload):
     socket_server.emit(sending_json, broadcast=True)
     return
 
+
 '''
 @socket_server.on('test_msg')
 def test_msg(rawdata):
@@ -96,6 +97,7 @@ def test_msg(rawdata):
     response = json.dumps({"msg_type": "test_msg", "msg": rawdata})
     socket_server.emit('test_msg', response)
 '''
+
 
 @socket_server.on('send_chat')
 def send_chat(rawdata):
@@ -114,6 +116,14 @@ def on_join(data):
     room = data['room']
     join_room(room)
     socket_server.send(data['displayName'] + ' has entered the room.', room=room)
+    pass
+
+
+@socket_server.on('leave')
+def on_leave(data):
+    room = data['room']
+    leave_room(room)
+    socket_server.send(data['displayName'] + ' has left the room.', room=room)
     pass
 
 
@@ -160,8 +170,8 @@ if __name__ == '__main__':
     port = 8080
     if len(sys.argv) >= 2:
         port = sys.argv[1]
-    chessMap = {'map': [[None, None, None], [None, None, None], [None, None, None]], 'result': None, 'finished': False,
-                'n': 0}
+    chess_map = {'map': [[None, None, None], [None, None, None], [None, None, None]], 'result': None, 'finished': False,
+                 'n': 0}
     collection_list = ["user", "chat", "image", "moment"]
     db_list = connect_databases(collection_list)
     user_collection = db_list["user"]
