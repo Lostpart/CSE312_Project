@@ -7,13 +7,7 @@
             <v-col cols="auto">
               <v-dialog transition="dialog-top-transition" max-width="600">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    fab
-                    small
-                    style="float: right; margin: 20px"
-                    v-bind="attrs"
-                    v-on="on"
-                  >
+                  <v-btn fab small style="float: right; margin: 20px" v-bind="attrs" v-on="on">
                     <v-icon> mdi-plus </v-icon>
                   </v-btn>
                 </template>
@@ -22,7 +16,7 @@
                     <v-toolbar color="primary" dark>Share a new moment</v-toolbar>
                     <v-file-input
                       style="margin-left: 10px"
-                      accept="image/*"
+                      accept="image/png, image/jpeg"
                       label="Picture"
                       v-model="newMomentImg"
                       filled
@@ -36,9 +30,7 @@
                       v-model="newMomentComment"
                     ></v-textarea>
                     <v-card-actions class="justify-end">
-                      <v-btn color="blue" rounded dark text @click="handleSubmit"
-                        >Submit</v-btn
-                      >
+                      <v-btn color="blue" rounded dark text @click="handleSubmit">Submit</v-btn>
                     </v-card-actions>
                     <v-card-actions class="justify-end">
                       <v-btn text rounded @click="dialog.value = false">Close</v-btn>
@@ -57,29 +49,22 @@
         </v-img>
         <div style="height: 500px" class="overflow-y-auto overflow-x-hidden">
           <v-row>
-            <v-col v-for="(item, i) in items" :key="i" cols="12">
+            <v-col v-for="(item, i) in momentsList" :key="i" cols="12">
               <v-card>
                 <div class="">
                   <div>
                     <v-row>
                       <v-col cols="2">
-                        <v-img
-                          :alt="`${item.title} avatar`"
-                          :src="item.avatar"
-                          :max-width="30"
-                          style="margin: 20px"
-                        ></v-img>
+                        <v-avatar color="blue" size="60" style="margin-top: 10px; margin-left: 10px">
+                          <span class="white--text text-h5">{{ getAvatarNameById(item.title) }}</span>
+                        </v-avatar>
                       </v-col>
                       <v-col style="float: left" cols="auto">
                         <div style="text-align: left; color: #3d97f5; padding-top: 15px">
-                          {{ item.title }}
+                          {{ getUsernameById(item.title) }}
                         </div>
-                        <div style="text-align: left">{{ item.artist }}</div>
-                        <v-avatar
-                          size="150"
-                          tile
-                          style="padding-top: 20px; padding-bottom: 20px"
-                        >
+                        <div style="text-align: left">{{ item.content }}</div>
+                        <v-avatar size="150" tile style="padding-top: 20px; padding-bottom: 20px">
                           <v-img :src="item.src"></v-img>
                         </v-avatar>
                         <v-row style="padding-top: 15px; padding-left: 5px">
@@ -101,70 +86,91 @@
 </template>
 
 <script>
-export default {
-  methods: {
-    handleSubmit() {},
-  },
-  computed: {
-    avatarName() {
-      const displayName = this.$store.state.user.displayName
-      if (displayName) return displayName.substring(0, 1).toUpperCase()
-      return ''
+  import axios from 'axios'
+
+  export default {
+    methods: {
+      getUsernameById(userID) {
+        const usersList = this.$store.state.user.usersList
+        console.log(usersList, userID)
+        for (let i = 0; i < usersList.length; i++) {
+          if (usersList[i]['user_id'] === userID) return usersList[i]['displayName']
+        }
+        return ''
+      },
+      getAvatarNameById(userID) {
+        return this.getUsernameById(userID).substring(0, 1).toUpperCase()
+      },
+      handleSubmit() {
+        this.fileToBase64(this.newMomentImg).then((fileInBase64WithPrefix) => {
+          const imgFileName = this.newMomentImg.name
+          const base64PrefixIdx = fileInBase64WithPrefix.search('base64,')
+          const fileInBase64 = fileInBase64WithPrefix.substring(base64PrefixIdx + 'base64,'.length)
+          const newMomentJson = {
+            user_id: this.$store.state.user.userID,
+            image: [{ filename: imgFileName, file: fileInBase64 }],
+            content: this.newMomentComment,
+          }
+          const _this = this
+          axios
+            .post('http://127.0.0.1:8080/moment/create', newMomentJson)
+            .then((response) => {
+              const responseObj = response.data
+              if (responseObj.status === 'error') {
+                alert(responseObj.message)
+                return
+              }
+              _this.newMomentImg = null
+              _this.newMomentComment = ''
+              axios
+                .post('http://127.0.0.1:8080/moment/getRecentMoments', { limit: 100 })
+                .then(function (response) {
+                  _this.$store.commit('setMomentsList', response.data)
+                  console.log('momentsList', response)
+                })
+                .catch(function (error) {
+                  console.log(error)
+                })
+            })
+            .catch((error) => alert(error))
+        })
+      },
+      fileToBase64(file) {
+        return new Promise((resolve) => {
+          const reader = new FileReader()
+          reader.onload = function (e) {
+            resolve(e.target.result)
+          }
+          reader.readAsDataURL(file)
+        })
+      },
     },
-  },
-  data: () => ({
-    newMomentImg: null,
-    newMomentComment: '',
-    messages: [
-      {
-        from: 'You',
-        message: `Sure, I'll see you later.`,
-        time: '10:42am',
-        color: 'deep-purple lighten-1',
+    computed: {
+      avatarName() {
+        const displayName = this.$store.state.user.displayName
+        if (displayName) return displayName.substring(0, 1).toUpperCase()
+        return ''
       },
-      {
-        from: 'John Doe',
-        message: 'Yeah, sure. Does 1:00pm work?',
-        time: '10:37am',
-        color: 'green',
+      momentsList() {
+        const orginalMomentsList = this.$store.state.user.momentsList
+        const res = []
+        for (let i = 0; i < orginalMomentsList.length; i++) {
+          const originalMoment = orginalMomentsList[i]
+          const newMoment = {}
+          newMoment['src'] =
+            originalMoment['image'].length === 0
+              ? ''
+              : 'http://localhost:8080/upload-image/' + originalMoment['image'][0]
+          newMoment['title'] = originalMoment['from']
+          newMoment['content'] = originalMoment['content']
+          res.push(newMoment)
+        }
+        return res
       },
-      {
-        from: 'You',
-        message: 'Did you still want to grab lunch today?',
-        time: '9:47am',
-        color: 'deep-purple lighten-1',
-      },
-    ],
-    items: [
-      {
-        src: 'https://cdn.vuetifyjs.com/images/cards/foster.jpg',
-        title: 'Plankton',
-        avatar:
-          'https://static.wikia.nocookie.net/spongebob/images/7/77/Plankton_stock_art.png',
-        artist: 'Foster the People',
-      },
-      {
-        src: 'https://cdn.vuetifyjs.com/images/cards/halcyon.png',
-        title: 'SpongeBob',
-        avatar:
-          'https://static.wikia.nocookie.net/spongebob/images/d/d7/SpongeBob_stock_art.png',
-        artist: 'Ellie Goulding',
-      },
-      {
-        src: 'https://cdn.vuetifyjs.com/images/cards/foster.jpg',
-        title: 'Plankton',
-        avatar:
-          'https://static.wikia.nocookie.net/spongebob/images/7/77/Plankton_stock_art.png',
-        artist: 'Foster the People',
-      },
-      {
-        src: 'https://cdn.vuetifyjs.com/images/cards/halcyon.png',
-        title: 'SpongeBob',
-        avatar:
-          'https://static.wikia.nocookie.net/spongebob/images/d/d7/SpongeBob_stock_art.png',
-        artist: 'Ellie Goulding',
-      },
-    ],
-  }),
-}
+    },
+    data: () => ({
+      newMomentImg: null,
+      newMomentComment: '',
+    }),
+  }
 </script>
