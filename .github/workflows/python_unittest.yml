@@ -25,7 +25,7 @@ jobs:
       - name: Run Tests
         id: python_unittest
         continue-on-error: true
-        run: python -m unittest discover -s ./test  -p 'test_*.py'
+        run: python -m unittest
 
       - name: Discord notification (on success)
         env:
