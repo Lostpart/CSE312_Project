@@ -1,0 +1,48 @@
+name: Python Tests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Python 3
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          cd $GITHUB_WORKSPACE
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Tests
+        id: python_unittest
+        continue-on-error: true
+        run: python -m unittest discover -s ./test  -p 'test_*.py'
+
+      - name: Discord notification (on success)
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_USERNAME: "GitHub Python Unittest"
+        uses: Ilshidur/action-discord@master
+        with:
+          args: 'All tests pass'
+        if: always() && (steps.python_unittest.outcome != 'failure')
+
+      - name: Discord notification (on fail)
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_USERNAME: "GitHub Python Unittest"
+        uses: Ilshidur/action-discord@master
+        with:
+          args: 'Some tests fail, please check {{GITHUB_SERVER_URL}}/{{ GITHUB_REPOSITORY }}/actions/runs/{{ GITHUB_RUN_ID }}'
+        if: always() && (steps.python_unittest.outcome == 'failure')
