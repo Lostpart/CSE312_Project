@@ -92,7 +92,6 @@
     methods: {
       getUsernameById(userID) {
         const usersList = this.$store.state.user.usersList
-        console.log(usersList, userID)
         for (let i = 0; i < usersList.length; i++) {
           if (usersList[i]['user_id'] === userID) return usersList[i]['displayName']
         }
@@ -102,6 +101,14 @@
         return this.getUsernameById(userID).substring(0, 1).toUpperCase()
       },
       handleSubmit() {
+        if (!this.newMomentImg) {
+          alert('An image is required')
+          return
+        }
+        if (this.newMomentComment.length === 0) {
+          alert('A comment is required')
+          return
+        }
         this.fileToBase64(this.newMomentImg).then((fileInBase64WithPrefix) => {
           const imgFileName = this.newMomentImg.name
           const base64PrefixIdx = fileInBase64WithPrefix.search('base64,')
@@ -126,7 +133,6 @@
                 .post('http://127.0.0.1:8080/moment/getRecentMoments', { limit: 100 })
                 .then(function (response) {
                   _this.$store.commit('setMomentsList', response.data)
-                  console.log('momentsList', response)
                 })
                 .catch(function (error) {
                   console.log(error)

@@ -20,7 +20,6 @@ export default {
   mutations: {
     setMomentsList(state, val) {
       state.momentsList = val
-      console.log(val)
     },
     setMap(state, val) {
       state.map = val
@@ -40,7 +39,6 @@ export default {
       const row = Math.floor(i / 3)
       const col = i % 3
       state.map[row][col] = text
-      console.log(state.map)
     },
     setWebSocket(state, val) {
       state.webSocket = val

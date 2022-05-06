@@ -78,11 +78,10 @@
       window.addEventListener('beforeunload', (e) => this.beforeunloadFn(e))
     },
     beforeDestroy() {
-      console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaa')
-      this.socket.emit('join', {
-        displayName: 'Cusanity',
-        room: 'cse312',
-      })
+      // this.socket.emit('join', {
+      //   displayName: 'Cusanity',
+      //   room: 'cse312',
+      // })
     },
     computed: {
       currentUserAvatarName() {
@@ -189,7 +188,6 @@
         .post('http://127.0.0.1:8080/moment/getRecentMoments', { limit: 100 })
         .then(function (response) {
           _this.$store.commit('setMomentsList', response.data)
-          console.log('momentsList', response)
         })
         .catch(function (error) {
           console.log(error)
