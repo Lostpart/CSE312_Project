@@ -1,0 +1,2 @@
+USER_ONLINE = True
+USER_OFFLINE = False

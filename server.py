@@ -6,13 +6,15 @@ from flask_socketio import SocketIO, join_room, leave_room, rooms
 
 from controller.moment import moment_create_controller, moment_get_recent_moment_controller
 from dal import chat_db
-from controller import chat_controller
+from controller import chat_controller, user_controller
 from dal.connect_database import connect_databases
 from manager import user_manager
+from static import USER_ONLINE, USER_OFFLINE
 
 app = Flask(__name__, static_url_path='')
 # Python Socket code from 2019 Spring CSE 116
 socket_server = SocketIO(app, cors_allowed_origins='*')
+sid_to_user_id = {}
 
 
 @app.route("/")
@@ -58,7 +60,7 @@ def moment_get_recent_moments():
 
 
 @socket_server.on('connect')
-def test_connect(user_id):
+def connect(user_id):
     print('Client connected')
     global chess_map
     join_room(user_id)  # 创建自己的room
@@ -71,12 +73,6 @@ def update_map(new_map):
     global chess_map
     chess_map = new_map
     socket_server.emit('update_map', str(json.dumps(chess_map)), broadcast=True)
-
-
-@socket_server.on('disconnect')
-def test_disconnect():
-    print('Client disconnected')
-    # leave_room(user_id)  # 不存在多余的room，直接leave自己个人的room
 
 
 @socket_server.on('moment_like')
@@ -117,6 +113,9 @@ def send_chat(rawdata):
 
 @socket_server.on('join')
 def on_join(data):
+    user_id = data['room']
+    user_controller.set_user_activity(user_collection, user_id, USER_ONLINE)
+
     room = data['room']
     join_room(room)
     socket_server.send(data['displayName'] + ' has entered the room.', room=room)
@@ -125,6 +124,9 @@ def on_join(data):
 
 @socket_server.on('leave')
 def on_leave(data):
+    user_id = data['room']
+    user_controller.set_user_activity(user_collection, user_id, USER_OFFLINE)
+
     room = data['room']
     leave_room(room)
     socket_server.send(data['displayName'] + ' has left the room.', room=room)
