@@ -114,7 +114,7 @@ def send_chat(rawdata):
 @socket_server.on('join')
 def on_join(data):
     user_id = data['room']
-    user_controller.set_user_activity(user_collection, user_id, USER_ONLINE)
+    user_controller.set_user_activity(user_id, USER_ONLINE, user_collection)
 
     room = data['room']
     join_room(room)
@@ -125,7 +125,7 @@ def on_join(data):
 @socket_server.on('leave')
 def on_leave(data):
     user_id = data['room']
-    user_controller.set_user_activity(user_collection, user_id, USER_OFFLINE)
+    user_controller.set_user_activity(user_id, USER_OFFLINE, user_collection)
 
     room = data['room']
     leave_room(room)
