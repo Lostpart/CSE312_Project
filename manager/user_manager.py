@@ -38,9 +38,12 @@ def register(username, email, password, user_collection):
 
 def get_all_user(users_collection):
     """ Return user list in json format like this
-        {id: {"displayName": displayName, "email": email}, .......}
+        {{"displayName": displayName, "email": email, "user_id": id, "active": True/False}, .......}
     """
     return json.dumps(user_dal.retrieve_all(users_collection))
+
+def get_active_user(users_collection):
+    return json.dumps(user_dal.retrieve_active_user(users_collection))
 
 
 def check_email_format(email: str):

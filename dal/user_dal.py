@@ -10,7 +10,7 @@ import json
 def create(user_collection, displayName: str, email: str, password: str):
     """Create user info and store it in DB["user"]"""
     current_time = get_current_time()
-    user_dict = {"displayName": displayName, "email": email, "password": password, "last_update_time": current_time}
+    user_dict = {"displayName": displayName, "email": email, "password": password, "last_update_time": current_time, "active": False}
     user_collection.insert_one(user_dict)
     result_dic = {}
     fields = ["displayName", "email"]
@@ -34,10 +34,11 @@ def get_user(user_collection, id=None, email: str = None, password: str = None):
         error_message = "information missing"
         return construct_return_message(False, error_message)
     if user_dict:
-        user_dict["user_id"] = str(user_dict["_id"])
-        user_dict.pop("_id")
-        userInfo = user_dict
-        return construct_return_message(True, userInfo)
+        result_dic = {}
+        fields = ["displayName", "email"]
+        result_dic = construct_return_dict(user_dict, fields)
+        result_dic["user_id"] = str(user_dict["_id"])
+        return construct_return_message(True, result_dic)
         # else:
         #     error_message = "Your email or password is wrong"
         #     return construct_return_message(False, "error_message", error_message)
@@ -77,13 +78,24 @@ def delete_user(id: object):
     return 0
 
 def retrieve_all(user_collection):
-    all_users_with_object_id = list(user_collection.find({}, {"password": 0, "last_update_time": 0}))
-    all_users = {}
+    all_users_with_object_id = list(user_collection.find({}, {"displayName": 1, "active": 1, "_id": 1, "email": 1}))
+    all_users = []
     for user in all_users_with_object_id:
         temp_user = user
         id =  str(user["_id"])
+        temp_user["user_id"] = id
         temp_user.pop("_id")
-        all_users[id] = temp_user
+        all_users.append(temp_user)
+    return all_users
+def retrieve_active_user(user_collection):
+    all_users_with_object_id = list(user_collection.find({"active": True}, {"displayName": 1, "active": 1, "_id": 1, "email": 1}))
+    all_users = []
+    for user in all_users_with_object_id:
+        temp_user = user
+        id =  str(user["_id"])
+        temp_user["user_id"] = id
+        temp_user.pop("_id")
+        all_users.append(temp_user)
     return all_users
     
 # def connect_user_DB():

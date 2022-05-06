@@ -46,6 +46,10 @@ class UnitTesting(unittest.TestCase):
 
     def test_update(self):
         # 说没用到所以不写先放着
+        # test_result = create(self.user_collection, self.user[0][0], self.user[0][1], self.user[0][2])
+        # id = test_result["user_id"]
+        # print(test_result)
+        # update_user(self.user_collection, id, "active", True)
         0
 
     def test_delete(self):
