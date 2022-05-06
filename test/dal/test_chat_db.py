@@ -3,7 +3,7 @@ import unittest
 
 import mongomock
 
-from dal.chat_db import send_chat, chat_history
+from dal.chat_db import send_chat, get_data
 
 
 class MyTestCase(unittest.TestCase):
@@ -19,7 +19,7 @@ class MyTestCase(unittest.TestCase):
             "image": None
         }
         send_chat(dict1, collection, False)
-        self.assertEqual([dict1], json.loads(chat_history({"from": "123456789012123456789012","to": "123456789012123456789013"}, collection)))
+        self.assertEqual([dict1], get_data({"from": "123456789012123456789012","to": "123456789012123456789013"}, collection))
         collection.delete_many({})
         dict3 = {
             "from": "123456789012123456789012",
@@ -35,7 +35,7 @@ class MyTestCase(unittest.TestCase):
             "image": None
         }
         send_chat(dict8, collection, False)
-        self.assertEqual([dict3], json.loads(chat_history({"from": "123456789012123456789012","to": "123456789012123456789013"}, collection)))
+        self.assertEqual([dict3], get_data({"from": "123456789012123456789012","to": "123456789012123456789013"}, collection))
         collection.delete_many({})
 
 
