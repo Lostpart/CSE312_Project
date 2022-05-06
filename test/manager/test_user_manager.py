@@ -1,4 +1,5 @@
 import unittest
+from bson import ObjectId
 import mongomock
 
 from manager.user_manager import *
@@ -85,6 +86,44 @@ class UnitTesting(unittest.TestCase):
         # Drop table at the end
         message = drop_table(self.database, "user")
         self.assertTrue(message)
+
+    def test_set_active(self):
+        # Set a non-existed user
+        user_id_str = "4FAFEE7F4430C0696529710E"
+        id = ObjectId(user_id_str)
+        test_user1 = json.loads(set_active(self.user_collection, id, True))
+        self.assertEqual(test_user1, {'status': 'Error', 'message': 'User account not found'})
+
+        # set a inactive user to active
+        test_user1 = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2], self.user_collection))
+        test_id1 = test_user1["user_id"]
+        userInfor = json.loads(get_all_user(self.user_collection))
+        updated_user = json.loads(set_active(self.user_collection, ObjectId(test_id1), True))
+        self.assertEqual(updated_user, {'displayName': 'howie', 'email': 'howie@gmail.com', 
+                                        'active': True, 'user_id': test_id1})
+
+        # set a active user to inactive
+        updated_user = json.loads(set_active(self.user_collection, ObjectId(test_id1), False))
+        self.assertEqual(updated_user, {'displayName': 'howie', 'email': 'howie@gmail.com', 
+                                        'user_id': test_id1, 'active': False})
+
+        # Drop table at the end
+        message = drop_table(self.database, "user")
+        self.assertTrue(message)
+
+    def test_get_user_by_id(self):
+        # Get a non-existed user
+        user_id_str = "4FAFEE7F4430C0696529710E"
+        id = ObjectId(user_id_str)
+        test_user1 = json.loads(get_user_by_id(self.user_collection, id))
+        self.assertEqual(test_user1, {'message': 'User not found', 'status': 'Error'})
+
+        # Get a user
+        test_user1 = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2], self.user_collection))
+        test_id1 = test_user1["user_id"]
+        test_user1 = json.loads(get_user_by_id(self.user_collection, ObjectId(test_id1)))
+        self.assertEqual(test_user1, {'displayName': 'howie', 'email': 'howie@gmail.com', 
+                                    'user_id': test_id1})
     
     def drop_table(database, table: str):
         if table in database.list_collection_names():

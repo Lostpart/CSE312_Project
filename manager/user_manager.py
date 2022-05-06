@@ -45,12 +45,30 @@ def get_all_user(users_collection):
 def get_active_user(users_collection):
     return json.dumps(user_dal.retrieve_active_user(users_collection))
 
+def set_active(user_collection, user_id, status):
+    return json.dumps(user_dal.update_user(user_collection, user_id, "active", status))
 
 def check_email_format(email: str):
     # Check if anything before @ is from a-z and 0-9 and if anything after @ is a-z and must have atleast 2 characters
     return re.search("^([a-z0-9_.-]+)@([\da-z.-]+)\.([a-z.]{2,6})$", email)
 
 
-def get_user_by_id(id, user_collection):
-    # return user_dal.get_user(user_collection, id=id)
-    return  user_dal.get_user_by_id(id, user_collection)
+def get_user_by_id(user_collection, id):
+    result = user_dal.get_user(user_collection, id=id)
+    if result["status"] == False:
+        result["status"] = "Error"
+    else:
+        result = result["message"]
+    return json.dumps(result)
+    # return  user_dal.get_user_by_id(user_collection, id)
+
+def get_user_by_email(user_collection, email):
+    result = user_dal.get_user(user_collection, email=email)
+    if result["status"] == False:
+        result["status"] == "Error"
+    else:
+        result = result["message"]
+    return json.dumps(result)
+
+def delete_user(user_collection, id):
+    0

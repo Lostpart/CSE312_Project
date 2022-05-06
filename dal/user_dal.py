@@ -45,30 +45,32 @@ def get_user(user_collection, id=None, email: str = None, password: str = None):
         error_message = "User not found"
         return construct_return_message(False, error_message)
 
-def get_user_by_id(id, user_collection):
-    # 哥们，DAL写的太复杂了
-    return user_collection.find_one({"_id": id})
+# def get_user_by_id(id, user_collection):
+#     # 哥们，DAL写的太复杂了
+#     # return user_collection.find_one({"_id": id})
+#     return get_user(user_collection, id)
+
+def get_user_by_email(user_collection, email):
+    return get_user(user_collection, email=email)
 
 
-def update_user(user_collection, id: object, email: str = None, display_name: str = None, password: str = None):
+def update_user(user_collection, id: object, key: str, value):
     # Not modified yet
-    # update_user("A", email, "B") will update field A with data B for account "email"
-    # Example: update_user("displayName", "123@gmail.com", "howie") will update 123@gmail.com's displayName to howie
+    # update_user(user_collection, "A", "email", B) will update user A's email with data B
+    # Example: update_user(user_collection, A, "email", "howie@asda.com") will update A's email to howie@asda.com
     # This function doesn't check email formmat, make check the email formatt before calling this
     user_dict = user_collection.find_one({"_id": id})
     if user_dict:
-        updated_user_dict = dict()
-        temp_dict = dict(
-            {"email": email, "displayName": display_name, "password": password})
-        for key in temp_dict:
-            if temp_dict[key] is not None:
-                updated_user_dict[key] = temp_dict[key]
+        user_collection.update_one({"_id": id}, {"$set": {key: value}})
+        user_dict = user_collection.find_one({"_id": id})
+        fields = ["displayName", "email", "active"]
         # print(updated_user_dict)
-        user_collection.update_one({"_id": id}, {"$set": updated_user_dict})
-        return True
+        result_dic = construct_return_dict(user_dict, fields)
+        result_dic["user_id"] = str(user_dict["_id"])
+        return result_dic
     else:
         error_message = "User account not found"
-        return_message_json = {"status": "error", "error_message": error_message}
+        return_message_json = {"status": "Error", "message": error_message}
         return return_message_json
 
 
