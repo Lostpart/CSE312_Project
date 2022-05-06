@@ -67,19 +67,20 @@ class UnitTesting(unittest.TestCase):
     def test_get_all(self):
         # Test when there is no user in database
         user_list = json.loads(get_all_user(self.user_collection))
-        self.assertEqual(user_list, {})
+        self.assertEqual(user_list, [])
 
         # Test when there is one user
         test_user1 = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2], self.user_collection))
         test_id1 = test_user1["user_id"]
         user_list = json.loads(get_all_user(self.user_collection))
-        self.assertEqual(user_list, {test_id1: {"displayName": "howie", "email": "howie@gmail.com"}})
+        self.assertEqual(user_list, [{"user_id": test_id1, "displayName": "howie", "email": "howie@gmail.com", "active": False}])
 
         # Test when there are more than one user, which are two users
         test_user2 = json.loads(register(self.user[1][0], self.user[1][1], self.user[1][2], self.user_collection))
         test_id2 = test_user2["user_id"]
         user_list = json.loads(get_all_user(self.user_collection))
-        self.assertEqual(user_list, {test_id1: {'displayName': 'howie', 'email': 'howie@gmail.com'}, test_id2: {'displayName': 'shouyue', 'email': 'shoouyue@email.com'}})
+        self.assertEqual(user_list, [{'user_id': test_id1, 'displayName': 'howie', 'email': 'howie@gmail.com', "active": False}, 
+                    {'user_id': test_id2, 'displayName': 'shouyue', 'email': 'shoouyue@email.com', "active": False}])
 
         # Drop table at the end
         message = drop_table(self.database, "user")
