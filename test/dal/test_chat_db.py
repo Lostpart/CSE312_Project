@@ -15,59 +15,11 @@ class MyTestCase(unittest.TestCase):
         dict1 = {
             "from": "123456789012123456789012",
             "to": "123456789012123456789013",
-            "message": "leile"
+            "message": "leile",
+            "image": None
         }
         send_chat(dict1, collection, False)
-        dict2 = {
-            "from": "123456789012123456789012",
-            "to": "123456789012123456789013"
-        }
-        a = chat_history(dict2, collection)
-        a = json.loads(a)
-        self.assertEqual(a, [{'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'leile',
-                              'image': None}])  # add assertion here
-        collection.delete_many({})
-        dict3 = {
-            "from": "123456789012123456789012",
-            "to": "123456789012123456789013",
-            "message": "leile"
-        }
-        send_chat(dict3, collection, False)
-        dict4 = {
-            "from": "123456789012123456789013",
-            "to": "123456789012123456789012",
-            "message": "sheibushine",
-            "image": None
-        }
-        send_chat(dict4, collection, False)
-        dict5 = {
-            "from": "123456789012123456789012",
-            "to": "123456789012123456789013",
-            "message": "xiangshuijiao",
-            "image": None
-        }
-        send_chat(dict5, collection, False)
-        dict6 = {
-            "from": "123456789012123456789012",
-            "to": "123456789012123456789013",
-            "message": "woye",
-            "image": None
-        }
-        send_chat(dict6, collection, False)
-        dict7 = {
-            "from": "123456789012123456789012",
-            "to": "123456789012123456789013"
-        }
-        a = chat_history(dict7, collection)
-        a = json.loads(a)
-        print(a)
-        self.assertEqual(a, [
-            {'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'leile', 'image': None},
-            {'from': '123456789012123456789013', 'to': '123456789012123456789012', 'message': 'sheibushine',
-             'image': None},
-            {'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'xiangshuijiao',
-             'image': None}, {'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'woye',
-                              'image': None}])  # add assertion here
+        self.assertEqual([dict1], json.loads(chat_history({"from": "123456789012123456789012","to": "123456789012123456789013"}, collection)))
         collection.delete_many({})
         dict3 = {
             "from": "123456789012123456789012",
@@ -76,13 +28,6 @@ class MyTestCase(unittest.TestCase):
             "image": None
         }
         send_chat(dict3, collection, False)
-        dict4 = {
-            "from": "123456789012123456789013",
-            "to": "123456789012123456789012",
-            "message": "sheibushine",
-            "image": None
-        }
-        send_chat(dict4, collection, False)
         dict8 = {
             "from": "123456789012123456789012",
             "to": "123456789012123456789014",
@@ -90,40 +35,7 @@ class MyTestCase(unittest.TestCase):
             "image": None
         }
         send_chat(dict8, collection, False)
-        dict8 = {
-            "from": "123456789012123456789019",
-            "to": "123456789012123456789014",
-            "message": "xinsuiing",
-            "image": None
-        }
-        send_chat(dict8, collection, False)
-        dict5 = {
-            "from": "123456789012123456789012",
-            "to": "123456789012123456789013",
-            "message": "xiangshuijiao",
-            "image": None
-        }
-        send_chat(dict5, collection, False)
-        dict6 = {
-            "from": "123456789012123456789012",
-            "to": "123456789012123456789013",
-            "message": "woye",
-            "image": None
-        }
-        send_chat(dict6, collection, False)
-        dict7 = {
-            "from": "123456789012123456789012",
-            "to": "123456789012123456789013"
-        }
-        a = chat_history(dict7, collection)
-        a = json.loads(a)
-        self.assertEqual(a, [
-            {'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'leile', 'image': None},
-            {'from': '123456789012123456789013', 'to': '123456789012123456789012', 'message': 'sheibushine',
-             'image': None},
-            {'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'xiangshuijiao',
-             'image': None}, {'from': '123456789012123456789012', 'to': '123456789012123456789013', 'message': 'woye',
-                              'image': None}])  # add assertion here
+        self.assertEqual([dict3], json.loads(chat_history({"from": "123456789012123456789012","to": "123456789012123456789013"}, collection)))  # add assertion here
         collection.delete_many({})
 
 

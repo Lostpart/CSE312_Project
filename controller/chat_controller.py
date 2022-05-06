@@ -21,10 +21,7 @@ def controller(rawdata, collection):
 def check_data(rawdata):  # revise check json, check "from", "to", "message", "image" exists
     image_check = True
     if type(rawdata) is not dict:
-        try:
-            data = json.loads(rawdata)
-        except:
-            return False, "rawdata is not json format"
+        return False, "rawdata is not dict type"
     else:
         data = rawdata
     try:
