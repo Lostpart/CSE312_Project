@@ -39,9 +39,9 @@ def home_register():
     return user_manager.register(request.json['displayName'], request.json['email'], request.json['password'],
                                  user_collection)
 
-@app.route("/allusers", method=["GET"])
+@app.route("/allusers", methods=["GET"])
 def get_all_user():
-    return user_manager.get_all_user()
+    return user_manager.get_all_user(user_collection)
 
 
 @app.route("/moment/create", methods=["POST"])
