@@ -35,7 +35,7 @@ class MyTestCase(unittest.TestCase):
             "image": None
         }
         send_chat(dict8, collection, False)
-        self.assertEqual([dict3], json.loads(chat_history({"from": "123456789012123456789012","to": "123456789012123456789013"}, collection)))  # add assertion here
+        self.assertEqual([dict3], json.loads(chat_history({"from": "123456789012123456789012","to": "123456789012123456789013"}, collection)))
         collection.delete_many({})
 
 

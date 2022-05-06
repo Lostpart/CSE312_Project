@@ -29,9 +29,6 @@ def chat_history(data, chat_collection):  # chat history
     chat_tmp_collection = connect_database.connect_databases(["chat_tmp"])
     chat_tmp_collection = chat_tmp_collection["chat_tmp"]
 
-    # clean temp collection
-    chat_tmp_collection.delete_many({})
-
     # get chat 1
     answer1 = chat_collection.find({"from": ObjectId(user_from), "to": ObjectId(user)})
     for data in answer1:
@@ -51,6 +48,6 @@ def chat_history(data, chat_collection):  # chat history
         list1.append(i)
 
     # clean collection
-    chat_tmp_collection.delete_many({})
+    chat_tmp_collection.drop()
     # close chat_tmp_collection connection
     return json.dumps(list1)
