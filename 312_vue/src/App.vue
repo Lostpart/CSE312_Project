@@ -1,158 +1,220 @@
 <template>
-	<v-app>
-		<!-- <v-navigation-drawer app width="400"> -->
-		<v-navigation-drawer width="220" v-model="drawer" class="pa-0" app>
-			<v-sheet color="blue lighten-4" class="pa-0">
-				<v-list>
-					<v-list-item>
-						<v-list-item-avatar color="blue" size="60">
-							<span class="white--text text-h5">{{ currentUserAvatarName }}</span>
-						</v-list-item-avatar>
-					</v-list-item>
-					<v-list-item link>
-						<v-list-item-content>
-							<v-list-item-title class="text-h6">
-								{{ this.$store.state.user.displayName }}
-							</v-list-item-title>
-						</v-list-item-content>
+  <v-app>
+    <!-- <v-navigation-drawer app width="400"> -->
+    <DMNotification
+      style="position: absolute; top: 30px; right: 20px; z-index: 10"
+      :DmSender="DmSender"
+      :DmUserID="DmUserID"
+      :DmMsg="DmMsg"
+      v-show="DmDisplaying"
+    ></DMNotification>
+    <v-navigation-drawer width="220" v-model="drawer" class="pa-0" app>
+      <v-sheet color="blue lighten-4" class="pa-0">
+        <v-list>
+          <v-list-item>
+            <v-list-item-avatar color="blue" size="60">
+              <span class="white--text text-h5">{{ currentUserAvatarName }}</span>
+            </v-list-item-avatar>
+          </v-list-item>
+          <v-list-item link>
+            <v-list-item-content>
+              <v-list-item-title class="text-h6">
+                {{ this.$store.state.user.displayName }}
+              </v-list-item-title>
+            </v-list-item-content>
 
-						<v-list-item-action>
-							<v-icon>mdi-menu-down</v-icon>
-						</v-list-item-action>
-					</v-list-item>
-				</v-list>
-			</v-sheet>
+            <v-list-item-action>
+              <v-icon>mdi-menu-down</v-icon>
+            </v-list-item-action>
+          </v-list-item>
+        </v-list>
+      </v-sheet>
 
-			<v-divider></v-divider>
+      <v-divider></v-divider>
 
-			<v-list>
-				<v-list-item v-for="[icon, text, route] in links" :key="icon" link>
-					<v-list-item-icon>
-						<v-icon>{{ icon }}</v-icon>
-					</v-list-item-icon>
-					<v-list-item-content @click="$router.replace(route).catch((err) => {})">
-						<v-list-item-title>{{ text }}</v-list-item-title>
-					</v-list-item-content>
-				</v-list-item>
-			</v-list>
-		</v-navigation-drawer>
-		<v-main>
-			<v-container fluid>
-				<router-view></router-view>
-			</v-container>
-		</v-main>
+      <v-list>
+        <v-list-item v-for="[icon, text, route] in links" :key="icon" link>
+          <v-list-item-icon>
+            <v-icon>{{ icon }}</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content @click="$router.replace(route).catch((err) => {})">
+            <v-list-item-title>{{ text }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+    <v-main>
+      <v-container fluid>
+        <router-view></router-view>
+      </v-container>
+    </v-main>
 
-		<v-footer app color="transparent" height="40" inset>
-			<div class="text-center">
-				<v-btn dark @click="snackbar = true"> Check Socket Status </v-btn>
-				<v-snackbar v-model="snackbar">
-					{{ text }}
+    <v-footer app color="transparent" height="40" inset>
+      <div class="text-center">
+        <v-btn dark @click="snackbar = true"> Check Socket Status </v-btn>
+        <v-snackbar v-model="snackbar">
+          {{ text }}
 
-					<template v-slot:action="{ attrs }">
-						<v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
-							Close
-						</v-btn>
-					</template>
-				</v-snackbar>
-			</div>
-		</v-footer>
-	</v-app>
+          <template v-slot:action="{ attrs }">
+            <v-btn color="pink" text v-bind="attrs" @click="snackbar = false"> Close </v-btn>
+          </template>
+        </v-snackbar>
+      </div>
+    </v-footer>
+  </v-app>
 </template>
 
 <script>
-import { io } from 'socket.io-client'
-import axios from 'axios'
+  import { io } from 'socket.io-client'
+  import axios from 'axios'
+  import DMNotification from '@/components/DMNotification.vue'
 
-export default {
-	name: 'App',
-	components: {
-		// HelloWorld,
-		// CardsStack,
-		// DashBoard
-	},
-	computed: {
-		currentUserAvatarName() {
-			const displayName = this.$store.state.user.displayName
-			if (displayName && displayName.length > 0)
-				return displayName.substring(0, 1).toUpperCase()
-			return ''
-		},
-	},
-	data: () => ({
-		snackbar: false,
-		text: '',
-		drawer: null,
-		links: [
-			['mdi-message-text', 'Messages', '/messages'],
-			['mdi-account-multiple', 'Square', '/square'],
-			['mdi-account-plus', 'Register', '/register'],
-			['mdi-account', 'Log In', '/login'],
-			['mdi-electron-framework', 'Moments', '/moments'],
-		],
-	}),
-	methods: {
-		reserve() {
-			this.loading = true
-			setTimeout(() => (this.loading = false), 2000)
-		},
-	},
-	mounted() {
-		const _this = this
-		const socket = io('http://127.0.0.1:8080', {
-			transports: ['websocket', 'polling'],
-		})
+  export default {
+    name: 'App',
+    components: {
+      DMNotification,
+    },
+    created() {
+      window.addEventListener('beforeunload', (e) => this.beforeunloadFn(e))
+    },
+    beforeDestroy() {
+      // this.socket.emit('join', {
+      //   displayName: 'Cusanity',
+      //   room: 'cse312',
+      // })
+    },
+    computed: {
+      currentUserAvatarName() {
+        const displayName = this.$store.state.user.displayName
+        if (displayName && displayName.length > 0) return displayName.substring(0, 1).toUpperCase()
+        return ''
+      },
+    },
+    data: () => ({
+      DmSender: '',
+      DmMsg: '',
+      DmDisplaying: false,
+      DmUserID: '',
+      snackbar: false,
+      text: '',
+      drawer: null,
+      socket: null,
+      links: [
+        ['mdi-message-text', 'Messages', '/messages'],
+        ['mdi-account-multiple', 'Square', '/square'],
+        ['mdi-account-plus', 'Register', '/register'],
+        ['mdi-account', 'Log In', '/login'],
+        ['mdi-electron-framework', 'Moments', '/moments'],
+        ['mdi-minus', 'Game', '/tictactoe'],
+      ],
+    }),
+    methods: {
+      beforeunloadFn(e) {
+        const displayName = this.$store.state.user.displayName
+        const userID = this.$store.state.user.userID
+        if(!displayName || displayName.length === 0 || !userID || userID.length === 0) return
+        this.socket.emit('leave', {
+          displayName: displayName,
+          room: userID,
+        })
+        e.preventDefault()
+      },
+      reserve() {
+        this.loading = true
+        setTimeout(() => (this.loading = false), 2000)
+      },
+      getUsernameById(userID) {
+        const usersList = this.$store.state.user.usersList
+        console.log(usersList)
+        for (let i = 0; i < usersList.length; i++) {
+          if (usersList[i]['user_id'] === userID) return usersList[i]['displayName']
+        }
+        return ''
+      },
+    },
+    mounted() {
+      window.onbeforeunload = () => {
+        this.clearViews()
+        return 'tips'
+      }
+      const _this = this
+      const socket = io('http://127.0.0.1:8080', {
+        transports: ['websocket', 'polling'],
+      })
 
-		socket.on('connect_error', (err) => {
-			this.text = err
-			this.snackbar = true
-		})
-		socket.on('connect', (resp) => {
-			this.text = resp && resp.data ? socket.id + ' ' + resp.data : ''
-			this.snackbar = true
-			this.$store.commit('setWebSocket', socket)
-		})
-		socket.on('disconnect', () => {
-			this.text = 'Disconnected'
-			this.snackbar = true
-		})
-		socket.on('new_chat', (resp) => {
-			this.$store.commit('addChatHistory', { incoming: true, data: JSON.parse(resp) })
-			setTimeout(() => {
-				const chatView = document.getElementById('chatView')
-				chatView.scrollTop = chatView.scrollHeight
-			}, 50)
-		})
-		axios
-			.get('http://127.0.0.1:8080/allusers')
-			.then(function (response) {
-				_this.$store.commit('setUsersList', response.data)
-			})
-			.catch(function (error) {
-				console.log(error)
-			})
-	},
-}
+      socket.on('connect_error', (err) => {
+        this.text = err
+        this.snackbar = true
+      })
+      socket.on('connect', (resp) => {
+        this.text = resp && resp.data ? socket.id + ' ' + resp.data : ''
+        this.snackbar = true
+        this.$store.commit('setWebSocket', socket)
+        this.socket = socket
+      })
+      socket.on('disconnect', () => {
+        this.text = 'Disconnected'
+        this.snackbar = true
+      })
+      socket.on('new_chat', (resp) => {
+        const newChatObj = JSON.parse(resp)
+        if (newChatObj['from'] === this.$store.state.user.userID) return
+        this.$store.commit('addChatHistory', { incoming: true, data: newChatObj })
+        setTimeout(() => {
+          const chatView = document.getElementById('chatView')
+          if (chatView) chatView.scrollTop = chatView.scrollHeight
+        }, 50)
+        this.DmUserID = newChatObj['from']
+        this.DmSender = this.getUsernameById(newChatObj['from'])
+        this.DmMsg = newChatObj['message']
+        this.DmDisplaying = true
+      })
+      socket.on('update_map', (resp) => {
+        const mapObj = JSON.parse(resp)
+        this.$store.commit('setMap', mapObj['map'])
+        this.$store.commit('setResult', mapObj['result'])
+        this.$store.commit('setFinished', mapObj['finished'])
+        this.$store.commit('setN', mapObj['n'])
+      })
+      axios
+        .get('http://127.0.0.1:8080/allusers')
+        .then(function (response) {
+          _this.$store.commit('setUsersList', response.data)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+      axios
+        .post('http://127.0.0.1:8080/moment/getRecentMoments', { limit: 100 })
+        .then(function (response) {
+          _this.$store.commit('setMomentsList', response.data)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    },
+  }
 </script>
 
 <style>
-#app {
-	font-family: Avenir, Helvetica, Arial, sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	text-align: center;
-	color: #2c3e50;
-}
+  #app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+  }
 
-nav {
-	padding: 30px;
-}
+  nav {
+    padding: 30px;
+  }
 
-nav a {
-	font-weight: bold;
-	color: #2c3e50;
-}
+  nav a {
+    font-weight: bold;
+    color: #2c3e50;
+  }
 
-nav a.router-link-exact-active {
-	color: #42b983;
-}
+  nav a.router-link-exact-active {
+    color: #42b983;
+  }
 </style>

@@ -6,18 +6,15 @@ from manager import image_manager
 
 
 def send_chat(data, chat_collection, image_check):  # add chat
-    print(data, chat_collection, image_check)
     from_user = data["from"]
     to_user = data["to"]
     message = data["message"]
     image_id = None
     if image_check:
-        print("here")
         image_data = data["image"]
-        #image_id = image_manager.add_image_by_base64(from_user, image_data)
+        # image_id = image_manager.add_image_by_base64(from_user, image_data)
     chat_collection.insert_one(
         {"from": ObjectId(from_user), "to": ObjectId(to_user), "message": message, "image": image_id})
-    print("finish")
     return
 
 
@@ -31,9 +28,6 @@ def chat_history(data, chat_collection):  # chat history
     # get collection
     chat_tmp_collection = connect_database.connect_databases(["chat_tmp"])
     chat_tmp_collection = chat_tmp_collection["chat_tmp"]
-
-    # clean temp collection
-    chat_tmp_collection.delete_many({})
 
     # get chat 1
     answer1 = chat_collection.find({"from": ObjectId(user_from), "to": ObjectId(user)})
@@ -54,6 +48,6 @@ def chat_history(data, chat_collection):  # chat history
         list1.append(i)
 
     # clean collection
-    chat_tmp_collection.delete_many({})
+    chat_tmp_collection.drop()
     # close chat_tmp_collection connection
     return json.dumps(list1)
