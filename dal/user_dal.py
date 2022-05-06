@@ -86,7 +86,7 @@ def retrieve_all(user_collection):
         all_users.append(temp_user)
     return all_users
 def retrieve_active_user(user_collection):
-    all_users_with_object_id = list(user_collection.find({}, {"displayName": 1, "active": 1, "_id": 1, "email": 1}))
+    all_users_with_object_id = list(user_collection.find({"active": True}, {"displayName": 1, "active": 1, "_id": 1, "email": 1}))
     all_users = []
     for user in all_users_with_object_id:
         temp_user = user
