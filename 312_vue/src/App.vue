@@ -2,6 +2,10 @@
 	<v-app>
 		<!-- <v-navigation-drawer app width="400"> -->
 		<div id="name"></div>
+		<v-overlay :value="overlay">
+			<v-color-picker v-model="color" dot-size="25" hide-inputs swatches-max-height="200"></v-color-picker>
+			<v-btn class="white--text" color="teal" @click="handleColorChange"> Confirm </v-btn>
+		</v-overlay>
 		<DMNotification
 			style="position: absolute; top: 30px; right: 20px; z-index: 10"
 			:DmSender="DmSender"
@@ -10,10 +14,10 @@
 			v-show="DmDisplaying"
 		></DMNotification>
 		<v-navigation-drawer width="220" v-model="drawer" class="pa-0" app>
-			<v-sheet color="blue lighten-4" class="pa-0">
+			<v-sheet :color="this.$store.state.user.color" class="pa-0">
 				<v-list>
 					<v-list-item>
-						<v-list-item-avatar color="blue" size="60">
+						<v-list-item-avatar color="#1c5cbc" size="60">
 							<span class="white--text text-h5">{{ currentUserAvatarName }}</span>
 						</v-list-item-avatar>
 					</v-list-item>
@@ -42,6 +46,7 @@
 						<v-list-item-title>{{ text }}</v-list-item-title>
 					</v-list-item-content>
 				</v-list-item>
+				<v-avatar :color="this.$store.state.user.color" @click="overlay = true" size="36"> </v-avatar>
 			</v-list>
 		</v-navigation-drawer>
 		<v-main>
@@ -90,14 +95,26 @@
 				if (displayName && displayName.length > 0) return displayName.substring(0, 1).toUpperCase()
 				return ''
 			},
+			avatarColor(){
+				return this.color + ' darken-3'
+			}
+		},
+		watch: {
+			// whenever question changes, this function will run
+			color(newColor) {
+				this.$store.commit('setColor', newColor)
+			},
 		},
 		data: () => ({
+			overlay: false,
 			DmSender: '',
 			DmMsg: '',
 			DmDisplaying: false,
 			DmUserID: '',
 			snackbar: false,
 			text: '',
+			color: '#1c5cbc',
+			// avatarColor: '',
 			drawer: null,
 			socket: null,
 			links: [
@@ -110,6 +127,10 @@
 			],
 		}),
 		methods: {
+			handleColorChange() {
+				this.overlay = false
+				
+			},
 			beforeunloadFn(e) {
 				const displayName = this.$store.state.user.displayName
 				const userID = this.$store.state.user.userID

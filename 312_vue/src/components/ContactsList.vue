@@ -11,7 +11,7 @@
 						link
 						v-show="user.active || !onlyActiveSwitch"
 					>
-						<v-list-item-avatar color="blue">
+						<v-list-item-avatar :color="user.active ? color : 'grey'">
 							<span class="white--text text-h5">{{ user.avatarName }}</span>
 						</v-list-item-avatar>
 
@@ -20,7 +20,7 @@
 						</v-list-item-content>
 
 						<v-list-item-icon>
-							<v-icon :color="user.active ? 'deep-purple accent-4' : 'grey'">
+							<v-icon :color="user.active ? color : 'grey'">
 								mdi-message-outline
 							</v-icon>
 						</v-list-item-icon>
@@ -28,7 +28,7 @@
 				</v-list>
 			</v-col>
 			<v-col v-show="isClicked">
-				<v-toolbar :color="`${this.isCurrentFriendActive ? 'blue' : 'grey'}`" dark>
+				<v-toolbar :color="`${this.isCurrentFriendActive ? this.color : 'grey'}`" dark>
 					<v-toolbar-title>{{ currentFriendDisplayName }}</v-toolbar-title>
 				</v-toolbar>
 				<div
@@ -47,7 +47,8 @@
 										min-width="50px"
 										class="pa-2 ma-4"
 										style="display: inline-block"
-										:class="{ 'light-blue': !chat.flag, 'white--text': !chat.flag }"
+										:color="chat.flag? '#ffffff' : color"
+										:class="{'white--text': !chat.flag }"
 										:style="{ float: chat.flag ? 'left' : 'right' }"
 									>
 										{{ chat.message }}
@@ -91,6 +92,9 @@ export default {
 		currentHistory: [],
 	}),
 	computed: {
+		color(){
+			return this.$store.state.user.color
+		},
 		usersListWithAvatarName() {
 			const usersList = this.$store.state.user.usersList.filter(
 				(user) => user.user_id !== this.$store.state.user.userID
