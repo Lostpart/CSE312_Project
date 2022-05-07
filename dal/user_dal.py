@@ -47,13 +47,13 @@ def get_user(user_collection, id=None, email: str = None, password: str = None):
         error_message = "User not found"
         return construct_return_message(False, error_message)
 
-def get_user_by_id(id, user_collection):
-    # 哥们，DAL写的太复杂了
-    # return user_collection.find_one({"_id": id})
-    return get_user(user_collection, id)
+# def get_user_by_id(id, user_collection):
+#     # 哥们，DAL写的太复杂了
+#     # return user_collection.find_one({"_id": id})
+#     return get_user(user_collection, id)
 
-def get_user_by_email(user_collection, email):
-    return get_user(user_collection, email=email)
+# def get_user_by_email(user_collection, email):
+#     return get_user(user_collection, email=email)
 
 
 def update_user(user_collection, id: object, key: str, value):
