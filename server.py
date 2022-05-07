@@ -4,7 +4,7 @@ import sys
 from flask import Flask, request
 from flask_socketio import SocketIO, join_room, leave_room, rooms
 
-from controller.moment import moment_create_controller, moment_get_recent_moment_controller
+from controller.moment import moment_create_controller, moment_get_recent_moment_controller, moment_like
 from dal import chat_db
 from controller import chat_controller, user_controller
 from dal.connect_database import connect_databases
@@ -76,9 +76,9 @@ def update_map(new_map):
 
 
 @socket_server.on('moment_like')
-def moment_like(payload):
+def ws_moment_like(payload):
     try:
-        result = moment_like.moment_like_controller(payload)
+        result = moment_like.moment_like_controller(payload, moment_collection)
     except ValueError as err:
         data = {"status": "error", "message": err}
         socket_server.send(json.dumps(data))
