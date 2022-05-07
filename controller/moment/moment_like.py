@@ -7,12 +7,7 @@ def moment_like_controller(payload, moment_collection):
     if payload is None:
         return on_fail("Invalid input: No payload")
 
-    try:
-        data = json.loads(payload)
-    except json.decoder.JSONDecodeError:
-        return on_fail("Invalid input: Not a JSON string")
-
-    moment_id = data["moment_id"]
+    moment_id = payload["moment_id"]
 
     try:
         db_result = like_moment(moment_id, moment_collection)
