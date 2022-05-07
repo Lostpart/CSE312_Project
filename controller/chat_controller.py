@@ -12,7 +12,6 @@ def controller(rawdata, collection):
         data = rawdata
         chat_db.send_chat(data, collection, note)  # store chat into db
         to = data["to"]
-        print("Client→Python：{}".format(data))
         response = {"status": True, "message": data}  # send new chat
         # close db connection
         return True, {"to": to, "response": response}
@@ -55,12 +54,3 @@ def check_data(rawdata):  # revise check json, check "from", "to", "message", "i
     if len(to) != 24:
         return False, "to is not consistent with ObjectId format"
     return True, image_check
-
-
-def html_escape(msg):
-    msg = msg.replace("&", "&amp;")
-    msg = msg.replace("<", "&lt;")
-    msg = msg.replace(">", "&gt;")
-    msg = msg.replace('"', "&quot;")
-    msg = msg.replace("'", "&apos;")
-    return msg

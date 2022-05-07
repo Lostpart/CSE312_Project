@@ -1,15 +1,11 @@
-import json
-
-import mongomock
 from bson import ObjectId
-from dal import connect_database
-from manager import image_manager
+from dal.escape import html_escape
 
 
 def send_chat(data, chat_collection, image_check):  # add chat
     from_user = data["from"]
     to_user = data["to"]
-    message = data["message"]
+    message = html_escape(data["message"])
     image_id = None
     if image_check:
         image_data = data["image"]
@@ -17,6 +13,7 @@ def send_chat(data, chat_collection, image_check):  # add chat
     chat_collection.insert_one(
         {"from": ObjectId(from_user), "to": ObjectId(to_user), "message": message, "image": image_id})
     return
+
 
 def get_data(data, chat_collection):
     from_user = data["from"]
@@ -39,6 +36,7 @@ def get_data(data, chat_collection):
             i["to"] = str(i["to"])
             list.append(i)
     return list
+
 
 '''
 def chat_history(data, chat_collection):  # chat history
