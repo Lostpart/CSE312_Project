@@ -9,6 +9,7 @@ from dal import chat_db
 from controller import chat_controller
 from dal.connect_database import connect_databases
 from manager import user_manager
+from controller import user_controller
 
 app = Flask(__name__, static_url_path='')
 # Python Socket code from 2019 Spring CSE 116
@@ -55,6 +56,9 @@ def moment_get_recent_moments():
     payload = request.data
     return moment_get_recent_moment_controller.get_recent_moments_controller(payload, image_collection,
                                                                              moment_collection)
+@app.route("/settings", methods = ["POST"])
+def update_settings():
+    return user_controller.set_user_setting(user_collection, request.json['user_id'], request.json['color'])
 
 
 @socket_server.on('connect')
