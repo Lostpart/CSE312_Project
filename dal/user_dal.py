@@ -10,7 +10,8 @@ import json
 def create(user_collection, displayName: str, email: str, password: str):
     """Create user info and store it in DB["user"]"""
     current_time = get_current_time()
-    user_dict = {"displayName": displayName, "email": email, "password": password, "last_update_time": current_time, "active": False}
+    user_dict = {"displayName": displayName, "email": email, "password": password, 
+                    "last_update_time": current_time, "active": False, "settings": "blue"}
     user_collection.insert_one(user_dict)
     result_dic = {}
     fields = ["displayName", "email"]
@@ -34,7 +35,7 @@ def get_user(user_collection, id=None, email: str = None, password: str = None):
         return construct_return_message(False, error_message)
     if user_dict:
         result_dic = {}
-        fields = ["displayName", "email"]
+        fields = ["displayName", "email", "settings"]
         result_dic = construct_return_dict(user_dict, fields)
         result_dic["user_id"] = str(user_dict["_id"])
         return construct_return_message(True, result_dic)

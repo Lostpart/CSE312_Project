@@ -72,3 +72,7 @@ def get_user_by_email(user_collection, email):
 
 def delete_user(user_collection, id):
     0
+
+def set_settings(user_collection, user_id, settings):
+    user_dal.update_user(user_collection, user_id, "settings", settings)
+    return user_dal.get_user(user_collection, user_id)

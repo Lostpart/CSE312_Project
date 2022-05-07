@@ -8,6 +8,7 @@ from dal import connect_database, chat_db
 from chat import chat_controller
 from dal.connect_database import connect_databases
 from manager import user_manager
+from controller import user_controller
 
 app = Flask(__name__, static_url_path='')
 # Python Socket code from 2019 Spring CSE 116
@@ -37,6 +38,10 @@ def home_login():
 def home_register():
     return user_manager.register(request.json['displayName'], request.json['email'], request.json['password'],
                                  user_collection)
+
+@app.route("/settings", methods = ["POST"])
+def update_settings():
+    return user_controller.set_user_setting(user_collection, request.json['user_id'], request.json['color'])
 
 
 @socket_server.on('connect')
