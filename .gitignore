@@ -130,7 +130,7 @@ dmypy.json
 .pyre/
 
 
-/static/
-/.idea/
-/mongodb-data
+static/*
+.idea/
+mongodb-data/
 launch.json
