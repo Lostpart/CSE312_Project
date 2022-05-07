@@ -36,11 +36,11 @@ class UnitTesting(unittest.TestCase):
         temp_user = create(self.user_collection, self.user[0][0], self.user[0][1], self.user[0][2])
         test_id = ObjectId(temp_user["user_id"])
         test_result = get_user(self.user_collection, test_id)
-        self.assertEqual(test_result, {'status': True, 'message': {'displayName': 'howie', 'email': 'howie@gmail.com', 'user_id': temp_user["user_id"]}})
+        self.assertEqual(test_result, {'status': True, 'message': {'displayName': 'howie', 'email': 'howie@gmail.com', 'user_id': temp_user["user_id"], 'settings': 'blue'}})
         
         # Get a existed user by email and password
         test_result = get_user(self.user_collection, None, self.user[0][1], self.user[0][2])
-        self.assertEqual(test_result, {'status': True, 'message': {'displayName': 'howie', 'email': 'howie@gmail.com', 'user_id': temp_user["user_id"]}})
+        self.assertEqual(test_result, {'status': True, 'message': {'displayName': 'howie', 'email': 'howie@gmail.com', 'user_id': temp_user["user_id"], 'settings': 'blue'}})
         message = drop_table(self.database, "user")
         self.assertTrue(message)
 
