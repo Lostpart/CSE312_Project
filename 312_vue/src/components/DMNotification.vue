@@ -1,7 +1,10 @@
 <template>
 	<v-card class="mx-auto" min-width="344" outlined>
+		<v-btn fab small @click="closeDM" :color="color" style="float: right; margin-top: 10px; margin-right: 10px">
+			<v-icon dark> mdi-close </v-icon>
+		</v-btn>
 		<v-list-item three-line>
-			<v-avatar size="60" color="blue" style="margin-top: 30px">
+			<v-avatar size="60" :color="color" style="margin-top: 30px">
 				<span class="white--text text-h5">{{ DmSenderAvatarName }}</span>
 			</v-avatar>
 			<v-list-item-content>
@@ -13,7 +16,13 @@
 			</v-list-item-content>
 		</v-list-item>
 		<div>
-			<v-text-field v-model="quickReply" style="margin-left: 10px" label="Quick Reply" :rules="rules" hide-details="true"></v-text-field>
+			<v-text-field
+				v-model="quickReply"
+				style="margin-left: 10px"
+				label="Quick Reply"
+				:rules="rules"
+				hide-details="true"
+			></v-text-field>
 		</div>
 		<v-card-actions>
 			<v-btn outlined rounded text @click="sendQuickReply"> Reply </v-btn>
@@ -23,7 +32,7 @@
 
 <script>
 	export default {
-		props: ['DmUserID', 'DmSender', 'DmMsg'],
+		props: ['DmUserID', 'DmSender', 'DmMsg', 'closeDM'],
 		data: () => ({
 			rules: [(value) => !!value || 'Reply cannot be empty'],
 			quickReply: '',
@@ -32,9 +41,13 @@
 			DmSenderAvatarName() {
 				return this.DmSender.substring(0, 1).toUpperCase()
 			},
+			color() {
+				return this.$store.state.user.color
+			},
 		},
 		methods: {
 			sendQuickReply() {
+				this.closeDM()
 				const chatObj = {
 					from: this.$store.state.user.userID,
 					to: this.DmUserID,
