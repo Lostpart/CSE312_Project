@@ -26,7 +26,7 @@ def get_data(data, chat_collection):
         {"from": ObjectId(from_user), "to": ObjectId(to_user)})
     if data1 is not None:
         for i in data1:
-            del i["_id"]
+            i["_id"] = str(i['_id'])
             i["from"] = str(i["from"])
             i["to"] = str(i["to"])
             list.append(i)
@@ -34,11 +34,11 @@ def get_data(data, chat_collection):
         {"from": ObjectId(to_user), "to": ObjectId(from_user)})
     if data2 is not None:
         for i in data2:
-            del i["_id"]
+            i["_id"] = str(i['_id'])
             i["from"] = str(i["from"])
             i["to"] = str(i["to"])
             list.append(i)
-    return list
+    return sorted(list, key = lambda i: i['_id'])
 
 '''
 def chat_history(data, chat_collection):  # chat history

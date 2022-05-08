@@ -26,8 +26,8 @@ def index():
 @app.route("/chatHistory", methods=["POST"])
 def chat_history():
     data = json.loads(request.get_data(as_text=True))
-    receive = chat_db.chat_history(data, chat_collection)
-    return receive
+    receive = chat_db.get_data(data, chat_collection)
+    return json.dumps(receive)
 
 
 # -------------- socket_server ------------------
