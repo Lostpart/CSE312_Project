@@ -1,12 +1,12 @@
 import json
 import sys
 
-from flask import Flask, request
-from flask_socketio import SocketIO, join_room, leave_room, rooms
+from flask import Flask, request, redirect
+from flask_socketio import SocketIO, join_room, leave_room
 
 from controller.moment import moment_create_controller, moment_get_recent_moment_controller, moment_like
 from dal import chat_db
-from controller import chat_controller, user_controller
+from controller import chat_controller
 from dal.connect_database import connect_databases
 from manager import user_manager
 from controller import user_controller
@@ -70,6 +70,7 @@ def connect(user_id):
     join_room(user_id)  # 创建自己的room
     socket_server.emit('connect', {'data': 'Connected'})
     socket_server.emit('update_map', str(json.dumps(chess_map)), broadcast=True)
+    return
 
 
 @socket_server.on('update_map')
@@ -77,6 +78,7 @@ def update_map(new_map):
     global chess_map
     chess_map = new_map
     socket_server.emit('update_map', str(json.dumps(chess_map)), broadcast=True)
+    return
 
 
 @socket_server.on('moment_like')
@@ -112,7 +114,7 @@ def send_chat(rawdata):
         join_room(rawdata["to"])  # 发送前join_room, 发完直接leave_room
         socket_server.emit('new_chat', json.dumps(answer["response"]['message']), room=rawdata["to"])
         leave_room(rawdata["to"])
-    pass
+    return
 
 
 @socket_server.on('join')
@@ -123,7 +125,7 @@ def on_join(data):
     room = data['room']
     join_room(room)
     socket_server.send(data['displayName'] + ' has entered the room.', room=room)
-    pass
+    return
 
 
 @socket_server.on('leave')
@@ -134,41 +136,16 @@ def on_leave(data):
     room = data['room']
     leave_room(room)
     socket_server.send(data['displayName'] + ' has left the room.', room=room)
-    pass
+    return
 
 
-# ------------------ test_route -------------------
-'''
-@app.route("/test-sendchat", methods=["POST"])
-def test_send_chat():
-    data = json.loads(request.get_data(as_text=True))
-    print(data)
-    image_check = False
-    mock_chat_collection = connect_database.connect_databases(["test-chat"])  # connect db
-    mock_chat_collection = mock_chat_collection["test-chat"]
-    receive = chat_db.send_chat(data, mock_chat_collection, image_check)
-    return "success"
+@app.before_request
+def before_request():
+    if not request.is_secure:
+        url = request.url.replace('http://', 'https://', 1)
+        code = 301
+        return redirect(url, code=code)
 
-
-@app.route("/test-getchat")
-def test_chat_history():
-    data = json.loads(request.get_data(as_text=True))
-    mock_chat_collection = connect_database.connect_databases(["test-chat"])  # connect db
-    mock_chat_collection = mock_chat_collection["test-chat"]
-    receive = chat_db.chat_history(data, mock_chat_collection)
-    mock_chat_collection.delete_many({})
-    return receive
-
-
-@app.route("/test-controller", methods=["POST"])
-def test_chat_controller():
-    data = (request.get_data(as_text=True))
-    (a, b) = chat_controller.controller(data)
-    if a is True:
-        return json.dumps(b["response"])
-    else:
-        return json.dumps(b)
-'''
 
 if __name__ == '__main__':
     port = 8080
