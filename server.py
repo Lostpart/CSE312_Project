@@ -89,7 +89,7 @@ def ws_moment_like(payload):
         return
 
     sending_json = json.dumps(result)
-    socket_server.emit(sending_json, broadcast=True)
+    socket_server.emit("moment_like", sending_json, broadcast=True)
     return
 
 
