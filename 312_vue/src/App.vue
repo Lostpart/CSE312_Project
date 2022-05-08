@@ -46,6 +46,13 @@
 						<v-list-item-title>{{ text }}</v-list-item-title>
 					</v-list-item-content>
 				</v-list-item>
+				<v-list-item>
+					<v-list-item-icon>
+						<v-list-item-content @click="logout">
+							<v-list-item-title> Log out </v-list-item-title>
+						</v-list-item-content>
+					</v-list-item-icon>
+				</v-list-item>
 				<v-avatar :color="this.$store.state.user.color" @click="overlay = true" size="36"> </v-avatar>
 			</v-list>
 		</v-navigation-drawer>
@@ -127,6 +134,22 @@
 			],
 		}),
 		methods: {
+			logout() {
+				const ws = this.$store.state.user.webSocket
+				const displayName = this.$store.state.user.displayName
+				const userID = this.$store.state.user.userID
+				if (ws) {
+					ws.emit('leave', {
+						displayName: displayName,
+						room: userID,
+					})
+				}
+				this.$store.commit('clearChatHistory')
+				this.$store.commit('clearDisplayName')
+				this.$store.commit('clearEmail')
+				this.$store.commit('clearColor')
+				this.$store.commit('clearUserID')
+			},
 			handleColorChange() {
 				this.overlay = false
 				axios

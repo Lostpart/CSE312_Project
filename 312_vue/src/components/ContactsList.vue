@@ -73,7 +73,6 @@
 		mounted() {
 			setInterval(() => {
 				this.currentHistory = this.$store.state.user.chatHistory[this.currentFriendUserID]
-				console.log(this.currentHistory)
 			}, 200)
 		},
 		data: () => ({

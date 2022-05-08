@@ -23,6 +23,15 @@
 
 		methods: {
 			login() {
+				const ws = this.$store.state.user.webSocket
+				const displayName = this.$store.state.user.displayName
+				const userID = this.$store.state.user.userID
+				if (ws && displayName && userID) {
+					ws.emit('leave', {
+						displayName: displayName,
+						room: userID,
+					})
+				}
 				const _this = this
 				const loginJson = {}
 				loginJson['email'] = this.email

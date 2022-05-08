@@ -22,6 +22,9 @@ export default {
 		setColor(state, val) {
 			state.color = val
 		},
+		clearColor(state) {
+			state.color = '#bfdefc'
+		},
 		setMomentsList(state, val) {
 			state.momentsList = val
 		},
