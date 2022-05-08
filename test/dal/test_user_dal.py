@@ -1,10 +1,11 @@
-from lib2to3.pgen2.token import RPAR
 import unittest
-from bson import ObjectId
-import mongomock
 
-from dal.user_dal import *
+import mongomock
+from bson import ObjectId
+
+from dal.user_dal import create, get_user
 from test.test_utils import drop_table
+
 
 class UnitTesting(unittest.TestCase):
     def setUp(self):
@@ -36,25 +37,18 @@ class UnitTesting(unittest.TestCase):
         temp_user = create(self.user_collection, self.user[0][0], self.user[0][1], self.user[0][2])
         test_id = ObjectId(temp_user["user_id"])
         test_result = get_user(self.user_collection, test_id)
-        self.assertEqual(test_result, {'status': True, 'message': {'displayName': 'howie', 'email': 'howie@gmail.com', 'user_id': temp_user["user_id"], 'settings': 'blue'}})
-        
+        self.assertEqual(test_result, {'status': True, 'message': {'displayName': 'howie', 'email': 'howie@gmail.com',
+                                                                   'user_id': temp_user["user_id"],
+                                                                   'settings': '#1c5cbc'}})
+
         # Get a existed user by email and password
         test_result = get_user(self.user_collection, None, self.user[0][1], self.user[0][2])
-        self.assertEqual(test_result, {'status': True, 'message': {'displayName': 'howie', 'email': 'howie@gmail.com', 'user_id': temp_user["user_id"], 'settings': 'blue'}})
+        self.assertEqual(test_result, {'status': True, 'message': {'displayName': 'howie', 'email': 'howie@gmail.com',
+                                                                   'user_id': temp_user["user_id"],
+                                                                   'settings': '#1c5cbc'}})
         message = drop_table(self.database, "user")
         self.assertTrue(message)
 
-    def test_update(self):
-        # 说没用到所以不写先放着
-        # test_result = create(self.user_collection, self.user[0][0], self.user[0][1], self.user[0][2])
-        # id = test_result["user_id"]
-        # print(test_result)
-        # update_user(self.user_collection, id, "active", True)
-        0
-
-    def test_delete(self):
-        # 说没用到所以不写先放着
-        0
 
     # Corret part
     username1 = "howie"
@@ -71,7 +65,7 @@ class UnitTesting(unittest.TestCase):
 
     # Wrong part
 
-    #wrong passowrd
+    # wrong passowrd
     username4 = "howie"
     email4 = "howie@gmail.com"
     password4 = "HaohuiLin"
@@ -99,6 +93,7 @@ class UnitTesting(unittest.TestCase):
     user.append((username5, email5, password5))
     user.append((username6, email6, password6))
     user.append((username7, email7, password7))
+
 
 if __name__ == '__main__':
     unittest.main()

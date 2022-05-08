@@ -1,4 +1,3 @@
-import json
 import unittest
 
 import mongomock
@@ -16,16 +15,18 @@ class MyTestCase(unittest.TestCase):
             "from": "123456789012123456789012",
             "to": "123456789012123456789013",
             "message": "leile",
-            "image": None
+            "image": None,
         }
         send_chat(dict1, collection, False)
-        self.assertEqual([dict1], get_data({"from": "123456789012123456789012","to": "123456789012123456789013"}, collection))
+        result1 = get_data({"from": "123456789012123456789012","to": "123456789012123456789013"}, collection)
+        result1[0].pop("_id")
+        self.assertEqual([dict1], result1)
         collection.delete_many({})
         dict3 = {
             "from": "123456789012123456789012",
             "to": "123456789012123456789013",
             "message": "leile",
-            "image": None
+            "image": None,
         }
         send_chat(dict3, collection, False)
         dict8 = {
@@ -35,7 +36,9 @@ class MyTestCase(unittest.TestCase):
             "image": None
         }
         send_chat(dict8, collection, False)
-        self.assertEqual([dict3], get_data({"from": "123456789012123456789012","to": "123456789012123456789013"}, collection))
+        result3 = get_data({"from": "123456789012123456789012","to": "123456789012123456789013"}, collection)
+        result3[0].pop("_id")
+        self.assertEqual([dict3], result3)
         collection.delete_many({})
 
 

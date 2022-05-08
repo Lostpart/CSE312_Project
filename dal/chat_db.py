@@ -1,9 +1,4 @@
-import json
-
-import mongomock
 from bson import ObjectId
-from dal import connect_database
-from manager import image_manager
 
 
 def send_chat(data, chat_collection, image_check):  # add chat
@@ -17,6 +12,7 @@ def send_chat(data, chat_collection, image_check):  # add chat
     chat_collection.insert_one(
         {"from": ObjectId(from_user), "to": ObjectId(to_user), "message": message, "image": image_id})
     return
+
 
 def get_data(data, chat_collection):
     from_user = data["from"]
@@ -38,7 +34,8 @@ def get_data(data, chat_collection):
             i["from"] = str(i["from"])
             i["to"] = str(i["to"])
             list.append(i)
-    return sorted(list, key = lambda i: i['_id'])
+    return sorted(list, key=lambda i: i['_id'])
+
 
 '''
 def chat_history(data, chat_collection):  # chat history

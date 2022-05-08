@@ -6,6 +6,7 @@ from manager.user_manager import *
 from dal.user_dal import *
 from test.test_utils import drop_table
 
+
 class UnitTesting(unittest.TestCase):
     def setUp(self):
         mongo_client = mongomock.MongoClient()
@@ -36,7 +37,7 @@ class UnitTesting(unittest.TestCase):
 
     def test_login(self):
         # Login as a non-exits user
-        
+
         test_user = json.loads(login(self.user[6][1], self.user[6][2], self.user_collection))
         self.assertEqual(test_user, {'status': 'Error', 'message': 'User not found'})
 
@@ -44,7 +45,8 @@ class UnitTesting(unittest.TestCase):
         # Login as a exited user with all correct infor
         test_user = json.loads(login(self.user[0][1], self.user[0][2], self.user_collection))
         test_id = test_user["user_id"]
-        self.assertEqual(test_user, {"displayName": "howie", "user_id": test_id, "email": "howie@gmail.com", 'settings': 'blue'})
+        self.assertEqual(test_user,
+                         {"displayName": "howie", "user_id": test_id, "email": "howie@gmail.com", 'settings': '#1c5cbc'})
 
         # Login as a exited user with wrong password
         test_user = json.loads(login(self.user[3][1], self.user[3][2], self.user_collection))
@@ -74,14 +76,17 @@ class UnitTesting(unittest.TestCase):
         test_user1 = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2], self.user_collection))
         test_id1 = test_user1["user_id"]
         user_list = json.loads(get_all_user(self.user_collection))
-        self.assertEqual(user_list, [{"user_id": test_id1, "displayName": "howie", "email": "howie@gmail.com", "active": False}])
+        self.assertEqual(user_list,
+                         [{"user_id": test_id1, "displayName": "howie", "email": "howie@gmail.com", "active": False}])
 
         # Test when there are more than one user, which are two users
         test_user2 = json.loads(register(self.user[1][0], self.user[1][1], self.user[1][2], self.user_collection))
         test_id2 = test_user2["user_id"]
         user_list = json.loads(get_all_user(self.user_collection))
-        self.assertEqual(user_list, [{'user_id': test_id1, 'displayName': 'howie', 'email': 'howie@gmail.com', "active": False}, 
-                    {'user_id': test_id2, 'displayName': 'shouyue', 'email': 'shoouyue@email.com', "active": False}])
+        self.assertEqual(user_list,
+                         [{'user_id': test_id1, 'displayName': 'howie', 'email': 'howie@gmail.com', "active": False},
+                          {'user_id': test_id2, 'displayName': 'shouyue', 'email': 'shoouyue@email.com',
+                           "active": False}])
 
         # Drop table at the end
         message = drop_table(self.database, "user")
@@ -98,12 +103,12 @@ class UnitTesting(unittest.TestCase):
         test_user1 = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2], self.user_collection))
         test_id1 = test_user1["user_id"]
         updated_user = json.loads(set_active(self.user_collection, ObjectId(test_id1), True))
-        self.assertEqual(updated_user, {'displayName': 'howie', 'email': 'howie@gmail.com', 
+        self.assertEqual(updated_user, {'displayName': 'howie', 'email': 'howie@gmail.com',
                                         'active': True, 'user_id': test_id1})
 
         # set a active user to inactive
         updated_user = json.loads(set_active(self.user_collection, ObjectId(test_id1), False))
-        self.assertEqual(updated_user, {'displayName': 'howie', 'email': 'howie@gmail.com', 
+        self.assertEqual(updated_user, {'displayName': 'howie', 'email': 'howie@gmail.com',
                                         'user_id': test_id1, 'active': False})
 
         # Drop table at the end
@@ -121,8 +126,8 @@ class UnitTesting(unittest.TestCase):
         test_user1 = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2], self.user_collection))
         test_id1 = test_user1["user_id"]
         updated_user = set_settings(self.user_collection, ObjectId(test_id1), "red")
-        self.assertEqual(updated_user, {'status': True, 'message': {'displayName': 'howie', 'email': 'howie@gmail.com', 'settings': 'red', 'user_id': test_id1}})
-
+        self.assertEqual(updated_user, {'status': True, 'message': {'displayName': 'howie', 'email': 'howie@gmail.com',
+                                                                    'settings': 'red', 'user_id': test_id1}})
 
     def test_get_user_by_id(self):
         # Get a non-existed user
@@ -135,10 +140,10 @@ class UnitTesting(unittest.TestCase):
         test_user1 = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2], self.user_collection))
         test_id1 = test_user1["user_id"]
         test_user1 = json.loads(get_user_by_id(self.user_collection, ObjectId(test_id1)))
-        self.assertEqual(test_user1, {'displayName': 'howie', 'email': 'howie@gmail.com', 
-                                    'user_id': test_id1, 'settings': 'blue'})
-    
-    def drop_table(database, table: str):
+        self.assertEqual(test_user1, {'displayName': 'howie', 'email': 'howie@gmail.com',
+                                      'user_id': test_id1, 'settings': '#1c5cbc'})
+
+    def drop_table(self, database, table: str):
         if table in database.list_collection_names():
             expect_table = database[table]
             expect_table.drop()
@@ -163,7 +168,7 @@ class UnitTesting(unittest.TestCase):
 
     # Wrong part
 
-    #wrong passowrd
+    # wrong passowrd
     username4 = "howie"
     email4 = "howie@gmail.com"
     password4 = "HaohuiLin"
@@ -191,6 +196,7 @@ class UnitTesting(unittest.TestCase):
     user.append((username5, email5, password5))
     user.append((username6, email6, password6))
     user.append((username7, email7, password7))
+
 
 if __name__ == '__main__':
     unittest.main()
