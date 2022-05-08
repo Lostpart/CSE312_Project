@@ -90,6 +90,17 @@
 	import axios from 'axios'
 
 	export default {
+		mounted() {
+			const _this = this
+			axios
+				.post('http://127.0.0.1:8080/moment/getRecentMoments', { limit: 100 })
+				.then(function (response) {
+					_this.$store.commit('setMomentsList', response.data)
+				})
+				.catch(function (error) {
+					console.log(error)
+				})
+		},
 		methods: {
 			handleLike(moment_id) {
 				this.$store.state.user.webSocket.emit('moment_like', {
