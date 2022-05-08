@@ -95,9 +95,9 @@
 				if (displayName && displayName.length > 0) return displayName.substring(0, 1).toUpperCase()
 				return ''
 			},
-			avatarColor(){
+			avatarColor() {
 				return this.color + ' darken-3'
-			}
+			},
 		},
 		watch: {
 			// whenever question changes, this function will run
@@ -129,7 +129,19 @@
 		methods: {
 			handleColorChange() {
 				this.overlay = false
-				
+				axios
+					.post('http://127.0.0.1:8080/settings', { user_id: this.$store.state.user.userID, color: this.$store.state.user.color })
+					.then(function (response) {
+						if (response.data && response.data.status) {
+							if (response.data.status === true) alert('Color setting updated')
+							else if (response.data.message) {
+								console.log(response.data.message)
+							}
+						}
+					})
+					.catch(function (error) {
+						console.log(error)
+					})
 			},
 			beforeunloadFn(e) {
 				const displayName = this.$store.state.user.displayName
@@ -211,6 +223,10 @@
 				this.$store.commit('setResult', mapObj['result'])
 				this.$store.commit('setFinished', mapObj['finished'])
 				this.$store.commit('setN', mapObj['n'])
+			})
+			socket.on('moment_like', (resp) => {
+				const momentUpdateObj = JSON.parse(JSON.parse(resp))
+				_this.$store.commit('updateMomentsList', momentUpdateObj)
 			})
 			axios
 				.get('http://127.0.0.1:8080/allusers')

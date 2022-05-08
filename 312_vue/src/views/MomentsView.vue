@@ -13,7 +13,7 @@
 								</template>
 								<template v-slot:default="dialog">
 									<v-card>
-										<v-toolbar color="primary" dark>Share a new moment</v-toolbar>
+										<v-toolbar :color="color">Share a new moment</v-toolbar>
 										<v-file-input
 											style="margin-left: 10px"
 											accept="image/png, image/jpeg"
@@ -30,7 +30,7 @@
 											v-model="newMomentComment"
 										></v-textarea>
 										<v-card-actions class="justify-end">
-											<v-btn color="blue" rounded dark text @click="handleSubmit">Submit</v-btn>
+											<v-btn :color="color" rounded dark text @click="handleSubmit">Submit</v-btn>
 										</v-card-actions>
 										<v-card-actions class="justify-end">
 											<v-btn text rounded @click="dialog.value = false">Close</v-btn>
@@ -42,7 +42,7 @@
 					</v-flex>
 
 					<v-card-title class="white--text mt-8">
-						<v-avatar color="blue" size="80">
+						<v-avatar color="#1c5cbc" size="80">
 							<span class="white--text text-h5">{{ avatarName }}</span>
 						</v-avatar>
 					</v-card-title>
@@ -55,7 +55,7 @@
 									<div>
 										<v-row>
 											<v-col cols="2">
-												<v-avatar color="blue" size="60" style="margin-top: 10px; margin-left: 10px">
+												<v-avatar :color="color" size="60" style="margin-top: 10px; margin-left: 10px">
 													<span class="white--text text-h5">{{ getAvatarNameById(item.title) }}</span>
 												</v-avatar>
 											</v-col>
@@ -93,8 +93,8 @@
 		methods: {
 			handleLike(moment_id) {
 				this.$store.state.user.webSocket.emit('moment_like', {
-          moment_id: moment_id,
-        })
+					moment_id: moment_id,
+				})
 			},
 			getUsernameById(userID) {
 				const usersList = this.$store.state.user.usersList
@@ -158,6 +158,9 @@
 			},
 		},
 		computed: {
+			color() {
+				return this.$store.state.user.color
+			},
 			avatarName() {
 				const displayName = this.$store.state.user.displayName
 				if (displayName) return displayName.substring(0, 1).toUpperCase()

@@ -36,6 +36,8 @@
 							_this.$store.commit('setDisplayName', response.data['displayName'])
 							_this.$store.commit('setEmail', response.data['email'])
 							_this.$store.commit('setUserID', response.data['user_id'])
+							console.log(response.data)
+							_this.$store.commit('setColor', response.data['settings'])
 							this.$store.state.user.webSocket.emit('join', {
 								displayName: response.data['displayName'],
 								room: response.data['user_id'],

@@ -18,12 +18,26 @@ export default {
 		momentsList: [],
 		color: '#bfdefc',
 	},
-  mutations: {
-    setColor(state, val) {
-      state.color = val
-    },
+	mutations: {
+		setColor(state, val) {
+			state.color = val
+		},
 		setMomentsList(state, val) {
 			state.momentsList = val
+		},
+		updateMomentsList(state, momentLikeObj) {
+			console.log('momentLikeObj:', typeof(momentLikeObj))
+			const momentToUpdateID = momentLikeObj["moment_id"]
+			console.log('momentTo:', momentToUpdateID)
+			for (let i = 0; i < state.momentsList.length; i++){
+				const moment = state.momentsList[i]
+				console.log(moment['moment_id']===momentToUpdateID)
+				if (moment['moment_id'] === momentToUpdateID) {
+					state.momentsList[i]['like'] = momentLikeObj['like']
+					console.log(state.momentsList)
+					return
+				}
+			}
 		},
 		setMap(state, val) {
 			state.map = val
