@@ -1,7 +1,7 @@
 import json
 import sys
 
-from flask import Flask, request, redirect
+from flask import Flask, request
 from flask_socketio import SocketIO, join_room, leave_room
 
 from controller.moment import moment_create_controller, moment_get_recent_moment_controller, moment_like
@@ -137,14 +137,6 @@ def on_leave(data):
     leave_room(room)
     socket_server.send(data['displayName'] + ' has left the room.', room=room)
     return
-
-
-@app.before_request
-def before_request():
-    if not request.is_secure:
-        url = request.url.replace('http://', 'https://', 1)
-        code = 301
-        return redirect(url, code=code)
 
 
 if __name__ == '__main__':
