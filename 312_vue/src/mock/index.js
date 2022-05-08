@@ -25,6 +25,7 @@ const momentCreateSuccess = function () {
 
 const getChatHistoryBetweenTwoUsers = function (options) {
 	const from_to = JSON.parse(options.body)
+	if(from_to.to === '626954235f287336f4624974') return []
 	const res = [
 		{ from: from_to.from, to: from_to.to, message: Random.sentence(2), image: null },
 		{ from: from_to.to, to: from_to.from, message: Random.sentence(2), image: null },

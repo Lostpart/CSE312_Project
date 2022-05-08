@@ -42,28 +42,28 @@
 								displayName: response.data['displayName'],
 								room: response.data['user_id'],
 							})
+							const usersList = this.$store.state.user.usersList
+							const userID = response.data['user_id']
+							if (usersList && userID) {
+								for (let i = 0; i < usersList.length; i++) {
+									axios
+										.post('http://127.0.0.1:8080/chatHistory', { from: userID, to: usersList[i]['user_id'] })
+										.then(function (response) {
+											const historyArr = response['data']
+											if (!historyArr) return
+											for (let i = 0; i < historyArr.length; i++) {
+												historyArr[i]['flag'] = historyArr[i]['from'] !== userID
+											}
+											_this.$store.commit('setChatHistory', { user_id: usersList[i]['user_id'], history: historyArr })
+										})
+										.catch(function (error) {
+											console.log(error)
+										})
+								}
+							}
 						}
 					})
 					.catch((error) => alert(error))
-				const usersList = this.$store.state.user.usersList
-				const userID = this.$store.state.user.userID
-				if (usersList && userID) {
-					for (let i = 0; i < usersList.length; i++) {
-						axios
-							.post('http://127.0.0.1:8080/chatHistory', { from: userID, to: usersList[i]['user_id'] })
-							.then(function (response) {
-								const historyArr = response['data']
-								if (!historyArr) return
-								for (let i = 0; i < historyArr.length; i++) {
-									historyArr[i]['flag'] = historyArr[i]['from'] !== userID
-								}
-								_this.$store.commit('setChatHistory', { user_id: usersList[i]['user_id'], history: historyArr})
-							})
-							.catch(function (error) {
-								console.log(error)
-							})
-					}
-				}
 			},
 			reset() {
 				this.$refs.form.reset()

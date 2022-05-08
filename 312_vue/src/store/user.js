@@ -26,15 +26,11 @@ export default {
 			state.momentsList = val
 		},
 		updateMomentsList(state, momentLikeObj) {
-			console.log('momentLikeObj:', typeof(momentLikeObj))
-			const momentToUpdateID = momentLikeObj["moment_id"]
-			console.log('momentTo:', momentToUpdateID)
-			for (let i = 0; i < state.momentsList.length; i++){
+			const momentToUpdateID = momentLikeObj['moment_id']
+			for (let i = 0; i < state.momentsList.length; i++) {
 				const moment = state.momentsList[i]
-				console.log(moment['moment_id']===momentToUpdateID)
 				if (moment['moment_id'] === momentToUpdateID) {
 					state.momentsList[i]['like'] = momentLikeObj['like']
-					console.log(state.momentsList)
 					return
 				}
 			}
@@ -93,15 +89,9 @@ export default {
 		},
 		addChatHistory(state, chatObj) {
 			if (chatObj['incoming']) {
-				if (state.chatHistory[chatObj['data']['from']] === undefined) {
-					state.chatHistory[chatObj['data']['from']] = []
-				}
 				chatObj['data']['flag'] = true
 				state.chatHistory[chatObj['data']['from']].push(chatObj['data'])
 			} else {
-				if (state.chatHistory[chatObj['data']['to']] === undefined) {
-					state.chatHistory[chatObj['data']['to']] = []
-				}
 				chatObj['data']['flag'] = false
 				state.chatHistory[chatObj['data']['to']].push(chatObj['data'])
 			}
