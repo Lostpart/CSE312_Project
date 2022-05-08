@@ -12,6 +12,7 @@
 			:DmUserID="DmUserID"
 			:DmMsg="DmMsg"
 			v-show="DmDisplaying"
+			:closeDM="closeDM"
 		></DMNotification>
 		<v-navigation-drawer width="220" v-model="drawer" class="pa-0" app>
 			<v-sheet :color="this.$store.state.user.color" class="pa-0">
@@ -38,15 +39,15 @@
 			<v-divider></v-divider>
 
 			<v-list>
-				<v-list-item v-for="[icon, text, route] in links" :key="icon" link>
-					<v-list-item-icon>
+				<v-list-item v-for="[icon, text, route, showWhenLoggedIn] in links" :key="icon" link v-show="loggedIn === showWhenLoggedIn">
+					<v-list-item-icon >
 						<v-icon>{{ icon }}</v-icon>
 					</v-list-item-icon>
 					<v-list-item-content @click="$router.replace(route).catch((err) => {})">
 						<v-list-item-title>{{ text }}</v-list-item-title>
 					</v-list-item-content>
 				</v-list-item>
-				<v-list-item>
+				<v-list-item v-show="loggedIn === true">
 					<v-list-item-icon>
 						<v-list-item-content @click="logout">
 							<v-list-item-title> Log out </v-list-item-title>
@@ -105,6 +106,9 @@
 			avatarColor() {
 				return this.color + ' darken-3'
 			},
+			loggedIn(){
+				return this.$store.state.user.loggedIn === true
+			}
 		},
 		watch: {
 			// whenever question changes, this function will run
@@ -125,15 +129,18 @@
 			drawer: null,
 			socket: null,
 			links: [
-				['mdi-message-text', 'Messages', '/messages'],
-				['mdi-account-multiple', 'Square', '/square'],
-				['mdi-account-plus', 'Register', '/register'],
-				['mdi-account', 'Log In', '/login'],
-				['mdi-electron-framework', 'Moments', '/moments'],
-				['mdi-minus', 'Game', '/tictactoe'],
+				['mdi-account-plus', 'Register', '/register', false],
+				['mdi-account', 'Log In', '/login', false],
+				['mdi-message-text', 'Messages', '/messages', true],
+				['mdi-electron-framework', 'Moments', '/moments', true],
+				['mdi-gamepad-circle-outline', 'Game', '/tictactoe', false],
+				// ['mdi-account-multiple', 'Square', '/square'],
 			],
 		}),
 		methods: {
+			closeDM() {
+				this.DmDisplaying = false
+			},
 			logout() {
 				const ws = this.$store.state.user.webSocket
 				const displayName = this.$store.state.user.displayName
@@ -149,6 +156,7 @@
 				this.$store.commit('clearEmail')
 				this.$store.commit('clearColor')
 				this.$store.commit('clearUserID')
+				this.$store.commit('setLoggedIn', false)
 			},
 			handleColorChange() {
 				this.overlay = false

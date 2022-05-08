@@ -17,8 +17,12 @@ export default {
 		finished: false,
 		momentsList: [],
 		color: '#bfdefc',
+		loggedIn: false
 	},
 	mutations: {
+		setLoggedIn(state, val) {
+			state.loggedIn = val	
+		},
 		setColor(state, val) {
 			state.color = val
 		},

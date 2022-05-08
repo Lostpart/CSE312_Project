@@ -18,3 +18,22 @@ new Vue({
 }).$mount('#app')
 
 Vue.prototype.webSocket = null
+
+router.beforeEach((to, from, next) => {
+	const userID = store.state.user.userID
+	if (typeof userID === 'undefined' || userID === null || userID.length === 0) {
+		if (to.name !== 'register' && to.name !== 'login' && to.name !== 'home' && to.name !== 'tictactoe') {
+			alert('You need to sign in first')
+			next({ name: 'login' })
+		} else {
+			next()
+		}
+	} else {
+		if (to.name === 'register' || to.name === 'login') {
+			alert('You already signed in')
+			next({ name: 'messages' })
+		} else {
+			next()
+		}
+	}
+})

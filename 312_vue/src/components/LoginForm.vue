@@ -16,9 +16,9 @@
 	export default {
 		data: () => ({
 			valid: true,
-			email: '1@12.com',
+			email: '',
 			emailRules: [(v) => !!v || 'E-mail is required', (v) => /.+@.+\..+/.test(v) || 'E-mail must be valid'],
-			password: '1',
+			password: '',
 		}),
 
 		methods: {
@@ -45,13 +45,14 @@
 							_this.$store.commit('setDisplayName', response.data['displayName'])
 							_this.$store.commit('setEmail', response.data['email'])
 							_this.$store.commit('setUserID', response.data['user_id'])
+							_this.$store.commit('setLoggedIn', true)
 							console.log(response.data)
 							_this.$store.commit('setColor', response.data['settings'])
-							this.$store.state.user.webSocket.emit('join', {
+							_this.$store.state.user.webSocket.emit('join', {
 								displayName: response.data['displayName'],
 								room: response.data['user_id'],
 							})
-							const usersList = this.$store.state.user.usersList
+							const usersList = _this.$store.state.user.usersList
 							const userID = response.data['user_id']
 							if (usersList && userID) {
 								for (let i = 0; i < usersList.length; i++) {
@@ -70,6 +71,7 @@
 										})
 								}
 							}
+							_this.$router.push({ name: 'messages' })
 						}
 					})
 					.catch((error) => alert(error))

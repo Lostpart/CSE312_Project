@@ -1,6 +1,7 @@
 <template>
 	<div>
-		<v-row justify="space-around" style="padding: 0px; margin: 0px">
+		<h1 v-show="!this.$store.state.user.loggedIn">You haven't signed in</h1>
+		<v-row justify="space-around" style="padding: 0px; margin: 0px" v-show="this.$store.state.user.loggedIn">
 			<v-card width="600">
 				<v-img height="180px" src="https://wallpaperaccess.com/full/3896911.jpg">
 					<v-flex class="text-xs-right">
