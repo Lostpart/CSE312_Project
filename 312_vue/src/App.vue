@@ -4,7 +4,7 @@
 		<div id="name"></div>
 		<v-overlay :value="overlay">
 			<v-color-picker v-model="color" dot-size="25" hide-inputs swatches-max-height="200"></v-color-picker>
-			<v-btn class="white--text" color="teal" @click="handleColorChange"> Confirm </v-btn>
+			<v-btn class="white--text" :color="color" @click="handleColorChange"> Confirm </v-btn>
 		</v-overlay>
 		<DMNotification
 			style="position: absolute; top: 30px; right: 20px; z-index: 10"
@@ -230,15 +230,48 @@
 			socket.on('new_chat', (resp) => {
 				const newChatObj = JSON.parse(resp)
 				if (newChatObj['from'] === this.$store.state.user.userID) return
-				this.$store.commit('addChatHistory', { incoming: true, data: newChatObj })
+				const sender = this.getUsernameById(newChatObj['from'])
+
+				const _this = this
+				if (!sender) {
+					const userID = this.$store.state.user.userID
+					axios
+						.get('http://127.0.0.1:8080/allusers')
+						.then(function (response) {
+							_this.$store.commit('setUsersList', response.data)
+							console.log(response.data)
+							axios
+								.post('http://127.0.0.1:8080/chatHistory', { from: newChatObj['from'], to: userID })
+								.then(function (response) {
+									const historyArr = response['data']
+									if (!historyArr) return
+									for (let i = 0; i < historyArr.length; i++) {
+										historyArr[i]['flag'] = historyArr[i]['from'] !== userID
+									}
+									_this.$store.commit('setChatHistory', { user_id: newChatObj['from'], history: historyArr })
+									_this.DmUserID = newChatObj['from']
+									_this.DmSender = _this.getUsernameById(newChatObj['from'])
+									_this.DmMsg = newChatObj['message']
+									_this.DmDisplaying = true
+								})
+								.catch(function (error) {
+									console.log(error)
+								})
+						})
+						.catch(function (error) {
+							console.log(error)
+						})
+				} else {
+					this.$store.commit('addChatHistory', { incoming: true, data: newChatObj })
+					this.DmUserID = newChatObj['from']
+					this.DmSender = this.getUsernameById(newChatObj['from'])
+					this.DmMsg = newChatObj['message']
+					this.DmDisplaying = true
+				}
 				setTimeout(() => {
 					const chatView = document.getElementById('chatView')
 					if (chatView) chatView.scrollTop = chatView.scrollHeight
 				}, 50)
-				this.DmUserID = newChatObj['from']
-				this.DmSender = this.getUsernameById(newChatObj['from'])
-				this.DmMsg = newChatObj['message']
-				this.DmDisplaying = true
 			})
 			socket.on('update_map', (resp) => {
 				const mapObj = JSON.parse(resp)
