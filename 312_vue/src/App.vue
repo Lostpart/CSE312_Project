@@ -70,10 +70,9 @@
 
 		<v-footer app color="transparent" height="40" inset>
 			<div class="text-center">
-				<v-btn dark @click="snackbar = true"> Check Socket Status </v-btn>
+				<v-btn dark @click="snackbar = true"> Check Connection </v-btn>
 				<v-snackbar v-model="snackbar">
 					{{ text }}
-
 					<template v-slot:action="{ attrs }">
 						<v-btn color="pink" text v-bind="attrs" @click="snackbar = false"> Close </v-btn>
 					</template>
@@ -199,7 +198,6 @@
 			},
 			getUsernameById(userID) {
 				const usersList = this.$store.state.user.usersList
-				console.log(usersList)
 				for (let i = 0; i < usersList.length; i++) {
 					if (usersList[i]['user_id'] === userID) return usersList[i]['displayName']
 				}
