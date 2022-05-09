@@ -1,7 +1,7 @@
 FROM node:16-alpine as vueBuild
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
-COPY /312_vue/package.json /app/package.json
+COPY ./312_vue/package.json /app/package.json
 RUN npm install
 COPY ./312_vue /app
 RUN npm run build
