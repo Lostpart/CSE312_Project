@@ -309,7 +309,7 @@
 					console.log(error)
 				})
 			axios
-				.post(axios.defaults.baseURL + '/moment/getRecentMoments', { limit: 100 })
+				.post(axios.defaults.baseURL + 'moment/getRecentMoments', { limit: 100 })
 				.then(function (response) {
 					_this.$store.commit('setMomentsList', response.data)
 				})

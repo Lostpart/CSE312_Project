@@ -3,7 +3,7 @@
 		<v-spacer></v-spacer>
 		<v-row>
 			<v-col cols="4">
-				<v-btn class="white--text" :color="color" @click="refreshUsersList" style="float: right"> Refresh List</v-btn>
+				<v-btn class="white--text" :color="color" @click="refreshUsersList" style="float: right" id="refresh_btn"> Refresh List</v-btn>
 				<v-switch v-model="onlyActiveSwitch" label="Only active users"></v-switch>
 				<v-list subheader max-height="10" v-if="updated">
 					<v-list-item v-for="user in usersListWithAvatarName" :key="user.user_id" link v-show="user.active || !onlyActiveSwitch">
@@ -73,9 +73,43 @@
 	export default {
 		components: {},
 		mounted() {
-			setInterval(() => {
-				this.currentHistory = this.$store.state.user.chatHistory[this.currentFriendUserID]
-			}, 200)
+			setInterval(()=>{
+				const refresh_btn = document.getElementById('refresh_btn')
+				refresh_btn.click()
+			}, 1000)
+			// const _this = this
+			// setInterval(() => {
+			// 	this.currentHistory = this.$store.state.user.chatHistory[this.currentFriendUserID]
+			// }, 1000)
+			// setInterval(() => {
+			// 	axios
+			// 		.get(axios.defaults.baseURL + 'allusers')
+			// 		.then(function (response) {
+			// 			const usersList = response.data
+			// 			const userID = _this.$store.state.user.userID
+			// 			_this.$store.commit('setUsersList', usersList)
+			// 			if (usersList && userID && userID.length > 0) {
+			// 				for (let i = 0; i < usersList.length; i++) {
+			// 					axios
+			// 						.post(axios.defaults.baseURL + 'chatHistory', { from: userID, to: usersList[i]['user_id'] })
+			// 						.then(function (response) {
+			// 							const historyArr = response['data']
+			// 							if (!historyArr) return
+			// 							for (let i = 0; i < historyArr.length; i++) {
+			// 								historyArr[i]['flag'] = historyArr[i]['from'] !== userID
+			// 							}
+			// 							_this.$store.commit('setChatHistory', { user_id: usersList[i]['user_id'], history: historyArr })
+			// 						})
+			// 						.catch(function (error) {
+			// 							console.log(error)
+			// 						})
+			// 				}
+			// 			}
+			// 		})
+			// 		.catch(function (error) {
+			// 			console.log(error)
+			// 		})
+			// }, 2000)
 		},
 		data: () => ({
 			updated: true,
@@ -122,7 +156,7 @@
 					.then(function (response) {
 						_this.$store.commit('setUsersList', response.data)
 						const usersList = response.data
-						const userID = this.$store.state.user.userID
+						const userID = _this.$store.state.user.userID
 						for (let i = 0; i < usersList.length; i++) {
 							axios
 								.post(axios.defaults.baseURL + 'chatHistory', { from: userID, to: usersList[i]['user_id'] })
