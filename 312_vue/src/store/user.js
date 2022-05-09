@@ -21,7 +21,7 @@ export default {
 	},
 	mutations: {
 		setLoggedIn(state, val) {
-			state.loggedIn = val	
+			state.loggedIn = val
 		},
 		setColor(state, val) {
 			state.color = val
@@ -97,9 +97,11 @@ export default {
 		addChatHistory(state, chatObj) {
 			if (chatObj['incoming']) {
 				chatObj['data']['flag'] = true
+				if (!state.chatHistory[chatObj['data']['from']]) state.chatHistory[chatObj['data']['from']] = []
 				state.chatHistory[chatObj['data']['from']].push(chatObj['data'])
 			} else {
 				chatObj['data']['flag'] = false
+				if (!state.chatHistory[chatObj['data']['to']]) state.chatHistory[chatObj['data']['to']] = []
 				state.chatHistory[chatObj['data']['to']].push(chatObj['data'])
 			}
 		},

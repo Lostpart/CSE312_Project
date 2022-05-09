@@ -147,6 +147,7 @@
 				this.DmDisplaying = false
 			},
 			logout() {
+				this.closeDM()
 				const ws = this.$store.state.user.webSocket
 				const displayName = this.$store.state.user.displayName
 				const userID = this.$store.state.user.userID
@@ -204,6 +205,31 @@
 				}
 				return ''
 			},
+			refreshUserHistory(DMuserID) {
+				const _this = this
+				axios
+					.get(axios.defaults.baseURL + 'allusers')
+					.then(function (response) {
+						_this.$store.commit('setUsersList', response.data)
+						const userID = _this.$store.state.user.userID
+						axios
+							.post(axios.defaults.baseURL + 'chatHistory', { from: DMuserID, to: userID })
+							.then(function (response) {
+								const historyArr = response['data']
+								if (!historyArr) return
+								for (let i = 0; i < historyArr.length; i++) {
+									historyArr[i]['flag'] = historyArr[i]['from'] !== userID
+								}
+								_this.$store.commit('setChatHistory', { user_id: DMuserID, history: historyArr })
+							})
+							.catch(function (error) {
+								console.log(error)
+							})
+					})
+					.catch(function (error) {
+						console.log(error)
+					})
+			},
 		},
 		mounted() {
 			const beforeUnloadListener = (event) => {
@@ -248,35 +274,8 @@
 				if (newChatObj['from'] === this.$store.state.user.userID) return
 				const sender = this.getUsernameById(newChatObj['from'])
 
-				const _this = this
 				if (!sender) {
-					const userID = this.$store.state.user.userID
-					axios
-						.get(axios.defaults.baseURL + 'allusers')
-						.then(function (response) {
-							_this.$store.commit('setUsersList', response.data)
-							console.log(response.data)
-							axios
-								.post(axios.defaults.baseURL + 'chatHistory', { from: newChatObj['from'], to: userID })
-								.then(function (response) {
-									const historyArr = response['data']
-									if (!historyArr) return
-									for (let i = 0; i < historyArr.length; i++) {
-										historyArr[i]['flag'] = historyArr[i]['from'] !== userID
-									}
-									_this.$store.commit('setChatHistory', { user_id: newChatObj['from'], history: historyArr })
-									_this.DmUserID = newChatObj['from']
-									_this.DmSender = _this.getUsernameById(newChatObj['from'])
-									_this.DmMsg = newChatObj['message']
-									_this.DmDisplaying = true
-								})
-								.catch(function (error) {
-									console.log(error)
-								})
-						})
-						.catch(function (error) {
-							console.log(error)
-						})
+					this.refreshUserHistory(sender)
 				} else {
 					this.$store.commit('addChatHistory', { incoming: true, data: newChatObj })
 					this.DmUserID = newChatObj['from']

@@ -3,7 +3,9 @@
 		<v-spacer></v-spacer>
 		<v-row>
 			<v-col cols="4">
-				<v-btn class="white--text" :color="color" @click="refreshUsersList" style="float: right" id="refresh_btn"> Refresh List</v-btn>
+				<v-btn class="white--text" :color="color" @click="refreshUsersList" style="float: right" id="refresh_btn">
+					Refresh List</v-btn
+				>
 				<v-switch v-model="onlyActiveSwitch" label="Only active users"></v-switch>
 				<v-list subheader max-height="10" v-if="updated">
 					<v-list-item v-for="user in usersListWithAvatarName" :key="user.user_id" link v-show="user.active || !onlyActiveSwitch">
@@ -73,10 +75,13 @@
 	export default {
 		components: {},
 		mounted() {
-			setInterval(()=>{
-				const refresh_btn = document.getElementById('refresh_btn')
-				refresh_btn.click()
-			}, 60000)
+			setInterval(() => {
+				this.currentHistory = this.$store.state.user.chatHistory[this.currentFriendUserID]
+			}, 200)
+			setInterval(() => {
+				this.refreshUsersList()
+				this.currentHistory = this.$store.state.user.chatHistory[this.currentFriendUserID]
+			}, 2000)
 			// const _this = this
 			// setInterval(() => {
 			// 	this.currentHistory = this.$store.state.user.chatHistory[this.currentFriendUserID]
@@ -150,6 +155,19 @@
 		},
 		methods: {
 			refreshUsersList() {
+				const _this = this
+				axios.get(axios.defaults.baseURL + 'allusers').then(function (response) {
+					_this.$store.commit('setUsersList', response.data)
+					const usersList = response.data
+					for (let i = 0; i < usersList.length; i++) {
+						if (usersList[i].user_id === _this.currentFriendUserID) {
+							_this.isCurrentFriendActive = usersList[i].active
+							return
+						}
+					}
+				})
+			},
+			refreshUsersListWithHistory() {
 				const _this = this
 				axios
 					.get(axios.defaults.baseURL + 'allusers')
