@@ -39,8 +39,13 @@
 			<v-divider></v-divider>
 
 			<v-list>
-				<v-list-item v-for="[icon, text, route, showWhenLoggedIn] in links" :key="icon" link v-show="loggedIn === showWhenLoggedIn">
-					<v-list-item-icon >
+				<v-list-item
+					v-for="[icon, text, route, showWhenLoggedIn] in links"
+					:key="icon"
+					link
+					v-show="loggedIn === showWhenLoggedIn"
+				>
+					<v-list-item-icon>
 						<v-icon>{{ icon }}</v-icon>
 					</v-list-item-icon>
 					<v-list-item-content @click="$router.replace(route).catch((err) => {})">
@@ -106,9 +111,9 @@
 			avatarColor() {
 				return this.color + ' darken-3'
 			},
-			loggedIn(){
+			loggedIn() {
 				return this.$store.state.user.loggedIn === true
-			}
+			},
 		},
 		watch: {
 			// whenever question changes, this function will run
@@ -133,7 +138,7 @@
 				['mdi-account', 'Log In', '/login', false],
 				['mdi-message-text', 'Messages', '/messages', true],
 				['mdi-electron-framework', 'Moments', '/moments', true],
-				['mdi-gamepad-circle-outline', 'Game', '/tictactoe', false],
+				['mdi-gamepad-circle-outline', 'Game', '/tictactoe', true],
 				// ['mdi-account-multiple', 'Square', '/square'],
 			],
 		}),
@@ -161,7 +166,10 @@
 			handleColorChange() {
 				this.overlay = false
 				axios
-					.post('http://127.0.0.1:8080/settings', { user_id: this.$store.state.user.userID, color: this.$store.state.user.color })
+					.post(axios.defaults.baseURL + 'settings', {
+						user_id: this.$store.state.user.userID,
+						color: this.$store.state.user.color,
+					})
 					.then(function (response) {
 						if (response.data && response.data.status) {
 							if (response.data.status === true) alert('Color setting updated')
@@ -217,7 +225,7 @@
 				return 'tips'
 			}
 			const _this = this
-			const socket = io('http://127.0.0.1:8080', {
+			const socket = io(window.location.host, {
 				transports: ['websocket', 'polling'],
 			})
 
@@ -244,12 +252,12 @@
 				if (!sender) {
 					const userID = this.$store.state.user.userID
 					axios
-						.get('http://127.0.0.1:8080/allusers')
+						.get(axios.defaults.baseURL + 'allusers')
 						.then(function (response) {
 							_this.$store.commit('setUsersList', response.data)
 							console.log(response.data)
 							axios
-								.post('http://127.0.0.1:8080/chatHistory', { from: newChatObj['from'], to: userID })
+								.post(axios.defaults.baseURL + 'chatHistory', { from: newChatObj['from'], to: userID })
 								.then(function (response) {
 									const historyArr = response['data']
 									if (!historyArr) return
@@ -293,7 +301,7 @@
 				_this.$store.commit('updateMomentsList', momentUpdateObj)
 			})
 			axios
-				.get('http://127.0.0.1:8080/allusers')
+				.get(axios.defaults.baseURL + 'allusers')
 				.then(function (response) {
 					_this.$store.commit('setUsersList', response.data)
 				})
@@ -301,7 +309,7 @@
 					console.log(error)
 				})
 			axios
-				.post('http://127.0.0.1:8080/moment/getRecentMoments', { limit: 100 })
+				.post(axios.defaults.baseURL + '/moment/getRecentMoments', { limit: 100 })
 				.then(function (response) {
 					_this.$store.commit('setMomentsList', response.data)
 				})

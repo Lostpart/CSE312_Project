@@ -53,7 +53,7 @@ export default {
       registerJson["email"] = this.email;
       registerJson["password"] = this.password;
       axios
-        .post("http://127.0.0.1:8080/register", registerJson)
+        .post(axios.defaults.baseURL + 'register', registerJson)
         .then((response) => {
           if (response.data.status === "Error") {
             alert(response.data["message"]);

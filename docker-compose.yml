@@ -1,5 +1,16 @@
 version: '3.3'
 services:
+  nginx:
+    container_name: nginx
+    build: ./nginx
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
   mongo:
     container_name: mongo
     image: mongo:5
@@ -23,8 +34,6 @@ services:
     build: .
     environment:
       WAIT_HOSTS: mongo:27017
-    ports:
-      - '8080:8080'
     volumes:
       - ./static/upload-image/:/root/static/upload-image/
     depends_on:

@@ -94,7 +94,7 @@
 		mounted() {
 			const _this = this
 			axios
-				.post('http://127.0.0.1:8080/moment/getRecentMoments', { limit: 100 })
+				.post(axios.defaults.baseURL + 'moment/getRecentMoments', { limit: 100 })
 				.then(function (response) {
 					_this.$store.commit('setMomentsList', response.data)
 				})
@@ -138,7 +138,7 @@
 					}
 					const _this = this
 					axios
-						.post('http://127.0.0.1:8080/moment/create', newMomentJson)
+						.post(axios.defaults.baseURL + 'moment/create', newMomentJson)
 						.then((response) => {
 							const responseObj = response.data
 							if (responseObj.status === 'error') {
@@ -148,7 +148,7 @@
 							_this.newMomentImg = null
 							_this.newMomentComment = ''
 							axios
-								.post('http://127.0.0.1:8080/moment/getRecentMoments', { limit: 100 })
+								.post(axios.defaults.baseURL + 'moment/getRecentMoments', { limit: 100 })
 								.then(function (response) {
 									_this.$store.commit('setMomentsList', response.data)
 								})
@@ -185,7 +185,7 @@
 					const originalMoment = orginalMomentsList[i]
 					const newMoment = {}
 					newMoment['src'] =
-						originalMoment['image'].length === 0 ? '' : 'http://localhost:8080/upload-image/' + originalMoment['image'][0]
+						originalMoment['image'].length === 0 ? '' : axios.defaults.baseURL + 'upload-image/' + originalMoment['image'][0]
 					newMoment['title'] = originalMoment['from']
 					newMoment['content'] = originalMoment['content']
 					newMoment['like'] = originalMoment['like']
