@@ -225,7 +225,7 @@
 				return 'tips'
 			}
 			const _this = this
-			const socket = io(axios.defaults.baseURL, {
+			const socket = io(window.location.host, {
 				transports: ['websocket', 'polling'],
 			})
 
