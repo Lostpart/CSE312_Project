@@ -118,14 +118,14 @@
 			refreshUsersList() {
 				const _this = this
 				axios
-					.get('http://127.0.0.1:8080/allusers')
+					.get(axios.defaults.baseURL + 'allusers')
 					.then(function (response) {
 						_this.$store.commit('setUsersList', response.data)
 						const usersList = response.data
 						const userID = this.$store.state.user.userID
 						for (let i = 0; i < usersList.length; i++) {
 							axios
-								.post('http://127.0.0.1:8080/chatHistory', { from: userID, to: usersList[i]['user_id'] })
+								.post(axios.defaults.baseURL + 'chatHistory', { from: userID, to: usersList[i]['user_id'] })
 								.then(function (response) {
 									const historyArr = response['data']
 									if (!historyArr) return

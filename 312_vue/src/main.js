@@ -7,6 +7,17 @@ import { io } from 'socket.io-client'
 import store from './store'
 import './mock'
 
+import apiConfigDev from '../apiConfig/apiConfigDev.json'
+import apiConfigProd from '../apiConfig/apiConfigProd.json'
+
+if (process.env.NODE_ENV !== 'development') {
+	axios.defaults.baseURL = apiConfigProd.api
+	Vue.prototype.apiConfig = apiConfigProd
+} else {
+	axios.defaults.baseURL = apiConfigDev.api
+	Vue.prototype.apiConfig = apiConfigDev
+}
+
 Vue.config.productionTip = false
 new Vue({
 	router,

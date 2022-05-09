@@ -37,7 +37,7 @@
 				loginJson['email'] = this.email
 				loginJson['password'] = this.password
 				axios
-					.post('http://127.0.0.1:8080/login', loginJson)
+					.post(axios.defaults.baseURL + 'login', loginJson)
 					.then((response) => {
 						if (response.data.status === 'Error') {
 							alert(response.data['message'])
@@ -57,7 +57,7 @@
 							if (usersList && userID) {
 								for (let i = 0; i < usersList.length; i++) {
 									axios
-										.post('http://127.0.0.1:8080/chatHistory', { from: userID, to: usersList[i]['user_id'] })
+										.post(axios.defaults.baseURL + 'chatHistory', { from: userID, to: usersList[i]['user_id'] })
 										.then(function (response) {
 											const historyArr = response['data']
 											if (!historyArr) return
