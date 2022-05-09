@@ -106,26 +106,6 @@ def retrieve_active_user(user_collection):
     return all_users
 
 
-# def connect_user_DB():
-#     # I'm using localhost. If you're using remote server, please change MongoClient in your need
-#     # Data formmater: CSE312 -> user
-#     #                         -> image, etc
-#     mongo_client = MongoClient("mongodb://localhost:27017")
-#     db = mongo_client["CSE312"]
-#     users_collection = db["user"]
-#     return users_collection
-
-# def drop_table(database, table: str):
-#     if table in database.list_collection_names():
-#         expect_table = database[table]
-#         expect_table.drop()
-#         # message = "Table " + table + "dropped"
-#         return True
-#     else:
-#         error_message = "Table " + table + " doesn't exist"
-#         return error_message
-
-
 def construct_return_message(status, message):
     return_message_dict = {"status": status, "message": message}
     return return_message_dict
