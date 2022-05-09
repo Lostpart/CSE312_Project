@@ -18,6 +18,8 @@ class UnitTesting(unittest.TestCase):
         test_user = json.loads(register(self.user[0][0], self.user[0][1], self.user[0][2], self.user_collection))
         self.assertTrue("user_id" in test_user.keys())
         test_id = test_user["user_id"]
+        # test = self.user_collection.find_one({"_id": ObjectId(test_id)})
+        # print(test)
         self.assertEqual(test_user, {"displayName": "howie", "user_id": test_id, "email": "howie@gmail.com"})
 
         # Register a repeated user
