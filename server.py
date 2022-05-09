@@ -142,7 +142,7 @@ def on_leave(data):
 if __name__ == '__main__':
     port = 8080
     if len(sys.argv) >= 2:
-        port = sys.argv[1]
+        port = int(sys.argv[1])
     chess_map = {'map': [[None, None, None], [None, None, None], [None, None, None]], 'result': None, 'finished': False,
                  'n': 0}
     collection_list = ["user", "chat", "image", "moment"]
