@@ -3,6 +3,8 @@ from unittest import result
 from pymongo import MongoClient
 import datetime as dt
 import json
+import base64
+import hashlib
 
 """This object contain the CRUD functions for user"""
 
@@ -10,7 +12,8 @@ import json
 def create(user_collection, displayName: str, email: str, password: str):
     """Create user info and store it in DB["user"]"""
     current_time = get_current_time()
-    user_dict = {"displayName": displayName, "email": email, "password": password,
+    hashed_password = base64.b64encode(hashlib.sha1(password.encode()).digest())
+    user_dict = {"displayName": displayName, "email": email, "password": hashed_password,
                  "last_update_time": current_time, "active": False, "settings": "#1c5cbc"}
     user_collection.insert_one(user_dict)
     result_dic = {}
@@ -27,7 +30,8 @@ def get_user(user_collection, id=None, email: str = None, password: str = None):
     if id is not None:
         user_dict = user_collection.find_one({"_id": id}, {"last_update_time": 0, "password": 0})
     elif email is not None and password is not None:
-        user_dict = user_collection.find_one({"email": email, "password": password},
+        hashed_password = base64.b64encode(hashlib.sha1(password.encode()).digest())
+        user_dict = user_collection.find_one({"email": email, "password": hashed_password},
                                              {"last_update_time": 0, "password": 0})
     elif email is not None:
         user_dict = user_collection.find_one({"email": email}, {"last_update_time": 0, "password": 0})
