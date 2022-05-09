@@ -76,7 +76,7 @@
 			setInterval(()=>{
 				const refresh_btn = document.getElementById('refresh_btn')
 				refresh_btn.click()
-			}, 1000)
+			}, 60000)
 			// const _this = this
 			// setInterval(() => {
 			// 	this.currentHistory = this.$store.state.user.chatHistory[this.currentFriendUserID]
